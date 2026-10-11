@@ -1,0 +1,901 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mesa RPG - Configurações</title>
+  <link rel="stylesheet" href="../assets/style.css">
+  <style>
+    /* Specific styles for Configuracoes */
+    .tab-content {
+      display: none;
+      animation: fadeIn 0.3s ease;
+    }
+    .tab-content.active {
+      display: block;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .config-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 24px;
+      margin-bottom: 24px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+    }
+
+    /* Permissions two-column layout */
+    .perms-layout {
+      display: grid;
+      grid-template-columns: 280px 1fr;
+      gap: 24px;
+    }
+    @media (max-width: 860px) {
+      .perms-layout {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .user-select-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .user-select-item {
+      padding: 12px 16px;
+      background: var(--bg-dark);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: all 0.2s ease;
+    }
+    .user-select-item:hover {
+      border-color: var(--gold);
+      transform: translateX(4px);
+    }
+    .user-select-item.active {
+      border-color: var(--gold);
+      background: rgba(201, 162, 39, 0.15);
+      font-weight: bold;
+    }
+
+    .perm-group {
+      background: var(--bg-dark);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 18px;
+      margin-bottom: 20px;
+    }
+    .perm-title {
+      font-size: 1.05rem;
+      color: var(--gold);
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 8px;
+    }
+
+    .checkbox-label {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+      font-size: 0.95rem;
+      user-select: none;
+      margin-bottom: 10px;
+    }
+    .checkbox-label input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      cursor: pointer;
+      accent-color: var(--gold);
+    }
+
+    .sub-perms-box {
+      margin-left: 28px;
+      padding-left: 12px;
+      border-left: 2px dashed var(--border);
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    /* Warning Callout */
+    .alert-callout {
+      background: rgba(139, 0, 0, 0.2);
+      border-left: 4px solid var(--red-light);
+      padding: 14px 18px;
+      border-radius: 0 6px 6px 0;
+      margin-bottom: 20px;
+      color: #ffb8b8;
+      font-size: 0.9rem;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    /* Custom Switch Toggle */
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 50px;
+      height: 26px;
+    }
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      inset: 0;
+      background-color: #2a2a4a;
+      transition: .3s;
+      border-radius: 26px;
+      border: 1px solid var(--border);
+    }
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 18px;
+      width: 18px;
+      left: 3px;
+      bottom: 3px;
+      background-color: var(--text);
+      transition: .3s;
+      border-radius: 50%;
+    }
+    input:checked + .slider {
+      background-color: var(--red);
+      border-color: var(--gold);
+    }
+    input:checked + .slider:before {
+      transform: translateX(24px);
+      background-color: var(--gold);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Navbar -->
+  <nav class="navbar">
+    <div class="navbar-brand">
+      <a href="../dashboard.html" class="logo">
+        <span>⚔️</span> MESA RPG
+      </a>
+      <span style="color: var(--gold); font-size: 1.1rem; border-left: 2px solid var(--border); padding-left: 14px; letter-spacing: 2px;">
+        CONFIGURAÇÕES
+      </span>
+    </div>
+    <div class="navbar-menu">
+      <a href="../dashboard.html" class="btn-ghost">
+        <span>←</span> Voltar ao Painel
+      </a>
+      <button class="btn-red" onclick="logout()" style="font-size: 0.9rem; font-weight: bold; letter-spacing: 1px;">
+        <span>🚪</span> SAIR DA CONTA
+      </button>
+    </div>
+  </nav>
+
+  <!-- Main Container -->
+  <div class="page-wrapper" style="padding-top: 30px;">
+    <!-- Title & Intro -->
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; flex-wrap: wrap; gap: 15px;">
+      <div>
+        <h1 style="margin-bottom: 4px;">Painel de Controle do Mestre</h1>
+        <p style="color: var(--text-dim); font-size: 0.95rem;">
+          Gerencie usuários cadastrados, controle perfis e atribua permissões de acesso às páginas e personagens.
+        </p>
+      </div>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <div class="tab-bar">
+      <div class="tab active" data-tab="tabControlePerfil" onclick="switchTab('tabControlePerfil')">
+        CONTROLE DE PERFIL
+      </div>
+      <div class="tab" data-tab="tabPermissoes" onclick="switchTab('tabPermissoes')">
+        PERMISSÕES
+      </div>
+      <div class="tab" data-tab="tabPerfilUsuario" onclick="switchTab('tabPerfilUsuario')">
+        PERFIL USUÁRIO
+      </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- TAB 1: CONTROLE DE PERFIL                  -->
+    <!-- ========================================== -->
+    <div id="tabControlePerfil" class="tab-content active">
+      <div class="config-card">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 12px;">
+          <h2 style="margin-bottom: 0;">Usuários Cadastrados</h2>
+          <button class="btn-gold" onclick="openNewUserModal()">
+            <span>➕</span> Cadastrar Novo Usuário
+          </button>
+        </div>
+
+        <div style="overflow-x: auto;">
+          <table>
+            <thead>
+              <tr>
+                <th>NOME</th>
+                <th>LOGIN</th>
+                <th>TIPO</th>
+                <th style="text-align: right;">AÇÕES</th>
+              </tr>
+            </thead>
+            <tbody id="usersTableBody">
+              <!-- Rendered dynamically -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- TAB 2: PERMISSÕES                          -->
+    <!-- ========================================== -->
+    <div id="tabPermissoes" class="tab-content">
+      <div class="perms-layout">
+        <!-- Left: List of Jogadores -->
+        <div class="config-card" style="padding: 16px;">
+          <h3 style="margin-bottom: 14px; font-size: 1.1rem; border-bottom: 1px solid var(--border); padding-bottom: 8px;">
+            Selecionar Jogador
+          </h3>
+          <div id="permsUserList" class="user-select-list">
+            <!-- Rendered dynamically -->
+          </div>
+        </div>
+
+        <!-- Right: Permissions Panel -->
+        <div class="config-card">
+          <div id="noUserSelectedPerms" style="text-align: center; padding: 40px; color: var(--text-dim);">
+            <div style="font-size: 2.5rem; margin-bottom: 10px;">🔐</div>
+            <h3>Selecione um jogador ao lado</h3>
+            <p>Escolha um jogador para gerenciar suas permissões de acesso às páginas e personagens.</p>
+          </div>
+
+          <div id="permsPanelDetails" style="display: none;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid var(--border); padding-bottom: 12px; flex-wrap: wrap; gap: 10px;">
+              <div>
+                <h2 id="permsSelectedUserName" style="margin-bottom: 2px;">Nome do Jogador</h2>
+                <span id="permsSelectedUserLogin" style="font-size: 0.85rem; color: var(--text-dim);">@login</span>
+              </div>
+              <button class="btn-gold" onclick="saveCurrentPermissions()">
+                <span>💾</span> Salvar Permissões
+              </button>
+            </div>
+
+            <!-- Access Group: Iniciar Sessao & Sub-pages -->
+            <div class="perm-group">
+              <div class="perm-title">
+                <span>🛡️</span> Acesso à Sessão e Páginas
+              </div>
+              <label class="checkbox-label" style="font-weight: bold; font-size: 1rem; color: var(--gold);">
+                <input type="checkbox" id="permIniciarSessao" onchange="toggleSessionPagesGroup(this.checked)">
+                PERMITIR INICIAR / ENTRAR NA SESSÃO
+              </label>
+
+              <div id="sessionSubPagesContainer" class="sub-perms-box">
+                <label class="checkbox-label">
+                  <input type="checkbox" class="perm-page-chk" value="hub">
+                  HUB / CÂMERAS / MESA
+                </label>
+                <label class="checkbox-label">
+                  <input type="checkbox" class="perm-page-chk" value="dados">
+                  DADOS (ROLADOR 3D / HISTÓRICO)
+                </label>
+                <label class="checkbox-label">
+                  <input type="checkbox" class="perm-page-chk" value="conteudos">
+                  CONTEÚDOS (MAPAS, ANOTAÇÕES E ÁUDIO)
+                </label>
+                <label class="checkbox-label">
+                  <input type="checkbox" class="perm-page-chk" value="registro">
+                  REGISTRO DE SESSÃO / DIÁRIO
+                </label>
+                <label class="checkbox-label">
+                  <input type="checkbox" class="perm-page-chk" value="personagens">
+                  PERSONAGENS
+                </label>
+              </div>
+            </div>
+
+            <!-- Access Group: Character Permissions (Can view / Can edit) -->
+            <div class="perm-group">
+              <div class="perm-title">
+                <span>📜</span> Permissões de Fichas de Personagens
+              </div>
+              <p style="font-size: 0.85rem; color: var(--text-dim); margin-bottom: 14px;">
+                Defina quais personagens este jogador pode visualizar e/ou editar. Personagens pertencentes ao jogador já possuem permissão por padrão.
+              </p>
+              <div style="overflow-x: auto;">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>PERSONAGEM</th>
+                      <th>DONO</th>
+                      <th style="text-align: center; width: 120px;">VISUALIZAR</th>
+                      <th style="text-align: center; width: 120px;">EDITAR</th>
+                    </tr>
+                  </thead>
+                  <tbody id="characterPermsTableBody">
+                    <!-- Populated dynamically -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <div style="text-align: right; margin-top: 20px;">
+              <button class="btn-gold" onclick="saveCurrentPermissions()">
+                <span>💾</span> Salvar Permissões do Jogador
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- TAB 3: PERFIL USUÁRIO                      -->
+    <!-- ========================================== -->
+    <div id="tabPerfilUsuario" class="tab-content">
+      <div class="config-card">
+        <h2 style="margin-bottom: 12px;">Hierarquia & Cargos de Perfil</h2>
+        
+        <!-- Warning alert banner -->
+        <div class="alert-callout">
+          <span style="font-size: 1.6rem;">⚠️</span>
+          <div>
+            <strong>Atenção de Segurança:</strong>
+            <div>Usuários configurados como <strong>Mestre</strong> possuem acesso total irrestrito a todos os recursos, fichas, configurações e exclusões do sistema.</div>
+          </div>
+        </div>
+
+        <div style="overflow-x: auto;">
+          <table>
+            <thead>
+              <tr>
+                <th>NOME</th>
+                <th>LOGIN</th>
+                <th>CARGO ATUAL</th>
+                <th style="text-align: center;">MUDAR PERFIL</th>
+                <th style="text-align: right;">STATUS</th>
+              </tr>
+            </thead>
+            <tbody id="userProfileRolesTableBody">
+              <!-- Rendered dynamically -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: CADASTRAR OU EDITAR USUÁRIO -->
+  <div id="modalUserEdit" class="modal-overlay">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3 id="modalUserTitle" style="margin: 0;">Cadastrar Novo Usuário</h3>
+        <button class="modal-close" onclick="closeModal('modalUserEdit')">&times;</button>
+      </div>
+      <form id="formUserEdit" onsubmit="handleSaveUser(event)">
+        <input type="hidden" id="editUserId" value="">
+        <div class="form-group">
+          <label>NOME COMPLETO</label>
+          <input type="text" id="userInputNome" required placeholder="Ex: Valerius o Protetor">
+        </div>
+        <div class="form-group">
+          <label>LOGIN / USUÁRIO</label>
+          <input type="text" id="userInputLogin" required placeholder="Ex: valerius">
+        </div>
+        <div class="form-group">
+          <label id="lblUserSenha">SENHA</label>
+          <input type="password" id="userInputSenha" placeholder="Digite uma senha">
+          <small id="hintUserSenha" style="display: none; color: var(--text-dim); font-size: 0.75rem; margin-top: 4px;">
+            Deixe em branco para manter a senha atual.
+          </small>
+        </div>
+        <div class="form-group">
+          <label>TIPO DE PERFIL</label>
+          <select id="userInputTipo">
+            <option value="jogador">Jogador</option>
+            <option value="mestre">Mestre</option>
+          </select>
+        </div>
+
+        <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 24px;">
+          <button type="button" class="btn-ghost" onclick="closeModal('modalUserEdit')">Cancelar</button>
+          <button type="submit" class="btn-gold">Salvar Usuário</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Global Scripts -->
+  <script src="../assets/auth.js"></script>
+  <script>
+    // State
+    let currentUser = null;
+    let usersList = [];
+    let charactersList = [];
+    let selectedPermUserId = null;
+
+    document.addEventListener('DOMContentLoaded', () => {
+      // Security Check: Both Auth and Mestre role required
+      currentUser = requireMestre();
+      if (!currentUser) return;
+
+      loadAllData();
+      renderUsersTable();
+      renderPermissionsList();
+      renderUserProfilesTable();
+    });
+
+    /**
+     * Load Data from localStorage
+     */
+    function loadAllData() {
+      usersList = getUsers();
+      charactersList = getCharacters();
+    }
+
+    /**
+     * Tab Switching
+     */
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+
+      const tabBtn = document.querySelector(`.tab[data-tab="${tabId}"]`);
+      if (tabBtn) tabBtn.classList.add('active');
+
+      const tabContent = document.getElementById(tabId);
+      if (tabContent) tabContent.classList.add('active');
+    }
+
+    /**
+     * ==========================================
+     * CONTROLE DE PERFIL (USERS TABLE & CRUD)
+     * ==========================================
+     */
+    function renderUsersTable() {
+      const tbody = document.getElementById('usersTableBody');
+      if (!tbody) return;
+      tbody.innerHTML = '';
+
+      usersList.forEach(u => {
+        const tr = document.createElement('tr');
+
+        const isDefaultMestre = (u.id === 'usr_mestre_default' || u.login === 'mestre');
+        const badge = u.perfil === 'mestre' 
+          ? '<span class="badge badge-mestre">Mestre</span>'
+          : '<span class="badge badge-jogador">Jogador</span>';
+
+        let deleteBtn = '';
+        if (isDefaultMestre) {
+          deleteBtn = `<span style="font-size: 0.8rem; color: var(--text-dim); font-style: italic;">(Mestre Padrão)</span>`;
+        } else {
+          deleteBtn = `<button class="btn-red" style="padding: 4px 10px; font-size: 0.8rem;" onclick="deleteUser('${escapeAttr(u.id)}')">Excluir</button>`;
+        }
+
+        tr.innerHTML = `
+          <td><strong>${escapeHtml(u.nome || u.login)}</strong></td>
+          <td style="color: var(--text);">${escapeHtml(u.login)}</td>
+          <td>${badge}</td>
+          <td style="text-align: right; white-space: nowrap;">
+            <button class="btn-ghost" style="padding: 4px 10px; font-size: 0.8rem; margin-right: 6px;" onclick="openEditUserModal('${escapeAttr(u.id)}')">Editar</button>
+            ${deleteBtn}
+          </td>
+        `;
+
+        tbody.appendChild(tr);
+      });
+    }
+
+    function openNewUserModal() {
+      document.getElementById('modalUserTitle').textContent = 'Cadastrar Novo Usuário';
+      document.getElementById('editUserId').value = '';
+      document.getElementById('userInputNome').value = '';
+      document.getElementById('userInputLogin').value = '';
+      document.getElementById('userInputSenha').value = '';
+      document.getElementById('userInputSenha').required = true;
+      document.getElementById('hintUserSenha').style.display = 'none';
+      document.getElementById('userInputTipo').value = 'jogador';
+      openModal('modalUserEdit');
+    }
+
+    function openEditUserModal(userId) {
+      const user = usersList.find(u => u.id === userId);
+      if (!user) return;
+
+      document.getElementById('modalUserTitle').textContent = 'Editar Usuário';
+      document.getElementById('editUserId').value = user.id;
+      document.getElementById('userInputNome').value = user.nome || '';
+      document.getElementById('userInputLogin').value = user.login || '';
+      document.getElementById('userInputSenha').value = '';
+      document.getElementById('userInputSenha').required = false;
+      document.getElementById('hintUserSenha').style.display = 'block';
+      document.getElementById('userInputTipo').value = user.perfil || 'jogador';
+      openModal('modalUserEdit');
+    }
+
+    function handleSaveUser(event) {
+      event.preventDefault();
+      const id = document.getElementById('editUserId').value;
+      const nome = document.getElementById('userInputNome').value.trim();
+      const login = document.getElementById('userInputLogin').value.trim();
+      const senha = document.getElementById('userInputSenha').value.trim();
+      const tipo = document.getElementById('userInputTipo').value;
+
+      if (!login || !nome) {
+        alert('Por favor, preencha os campos obrigatórios.');
+        return;
+      }
+
+      if (id) {
+        // Edit existing
+        const idx = usersList.findIndex(u => u.id === id);
+        if (idx !== -1) {
+          // Check login uniqueness if changed
+          if (usersList.some((u, i) => i !== idx && u.login === login)) {
+            alert('Este login já está em uso por outro usuário.');
+            return;
+          }
+
+          // Safety check: Cannot demote the last mestre
+          if (usersList[idx].perfil === 'mestre' && tipo !== 'mestre') {
+            const masterCount = usersList.filter(u => u.perfil === 'mestre').length;
+            if (masterCount <= 1) {
+              alert('Não é possível alterar este usuário: o sistema precisa ter pelo menos um Mestre.');
+              return;
+            }
+          }
+
+          usersList[idx].nome = nome;
+          usersList[idx].login = login;
+          usersList[idx].perfil = tipo;
+          if (senha) {
+            usersList[idx].pass = senha;
+          }
+        }
+      } else {
+        // Create new
+        if (usersList.some(u => u.login === login)) {
+          alert('Este login já está em uso por outro usuário.');
+          return;
+        }
+
+        const newUser = {
+          id: 'usr_' + Date.now(),
+          nome: nome,
+          login: login,
+          pass: senha || '123456',
+          perfil: tipo
+        };
+        usersList.push(newUser);
+      }
+
+      saveUsers(usersList);
+      closeModal('modalUserEdit');
+      renderUsersTable();
+      renderPermissionsList();
+      renderUserProfilesTable();
+    }
+
+    function deleteUser(userId) {
+      const user = usersList.find(u => u.id === userId);
+      if (!user) return;
+
+      if (user.id === 'usr_mestre_default' || user.login === 'mestre') {
+        alert('O usuário mestre padrão não pode ser excluído.');
+        return;
+      }
+
+      if (user.perfil === 'mestre') {
+        const masterCount = usersList.filter(u => u.perfil === 'mestre').length;
+        if (masterCount <= 1) {
+          alert('Não é possível excluir o único Mestre do sistema.');
+          return;
+        }
+      }
+
+      if (!confirm(`Deseja realmente excluir o usuário "${user.nome || user.login}"?`)) {
+        return;
+      }
+
+      usersList = usersList.filter(u => u.id !== userId);
+      saveUsers(usersList);
+
+      // Clean up permissions if any
+      try {
+        const rawPerms = localStorage.getItem('userPermissions');
+        if (rawPerms) {
+          const permsObj = JSON.parse(rawPerms);
+          delete permsObj[userId];
+          localStorage.setItem('userPermissions', JSON.stringify(permsObj));
+        }
+      } catch (e) {
+        console.error(e);
+      }
+
+      if (selectedPermUserId === userId) {
+        selectedPermUserId = null;
+        document.getElementById('noUserSelectedPerms').style.display = 'block';
+        document.getElementById('permsPanelDetails').style.display = 'none';
+      }
+
+      renderUsersTable();
+      renderPermissionsList();
+      renderUserProfilesTable();
+    }
+
+    /**
+     * ==========================================
+     * PERMISSÕES (PLAYER ACCESS CONTROL)
+     * ==========================================
+     */
+    function renderPermissionsList() {
+      const listContainer = document.getElementById('permsUserList');
+      if (!listContainer) return;
+      listContainer.innerHTML = '';
+
+      const jogadores = usersList.filter(u => u.perfil === 'jogador');
+      if (jogadores.length === 0) {
+        listContainer.innerHTML = '<div style="color:var(--text-dim); font-size:0.85rem; padding:10px;">Nenhum usuário jogador encontrado.</div>';
+        return;
+      }
+
+      jogadores.forEach(j => {
+        const item = document.createElement('div');
+        item.className = `user-select-item ${j.id === selectedPermUserId ? 'active' : ''}`;
+        item.onclick = () => selectPermUser(j.id);
+        item.innerHTML = `
+          <div>
+            <div>${escapeHtml(j.nome || j.login)}</div>
+            <div style="font-size:0.75rem; color:var(--text-dim);">@${escapeHtml(j.login)}</div>
+          </div>
+          <span>→</span>
+        `;
+        listContainer.appendChild(item);
+      });
+    }
+
+    function selectPermUser(userId) {
+      selectedPermUserId = userId;
+      renderPermissionsList();
+      renderPermissions(userId);
+    }
+
+    function renderPermissions(userId) {
+      const user = usersList.find(u => u.id === userId);
+      if (!user) return;
+
+      document.getElementById('noUserSelectedPerms').style.display = 'none';
+      document.getElementById('permsPanelDetails').style.display = 'block';
+
+      document.getElementById('permsSelectedUserName').textContent = user.nome || user.login;
+      document.getElementById('permsSelectedUserLogin').textContent = `@${user.login}`;
+
+      // Read current permissions
+      let permsObj = {};
+      try {
+        permsObj = JSON.parse(localStorage.getItem('userPermissions')) || {};
+      } catch (e) {
+        permsObj = {};
+      }
+
+      const userPerm = permsObj[userId] || {
+        pages: ['hub', 'dados', 'conteudos', 'registro', 'personagens'],
+        characters: []
+      };
+
+      // Set Iniciar Sessão & sub-pages
+      const pageList = userPerm.pages || [];
+      const hasSession = pageList.includes('iniciar_sessao') || pageList.length > 0;
+      const chkIniciar = document.getElementById('permIniciarSessao');
+      chkIniciar.checked = hasSession;
+
+      document.querySelectorAll('.perm-page-chk').forEach(chk => {
+        chk.checked = pageList.includes(chk.value);
+      });
+
+      toggleSessionPagesGroup(chkIniciar.checked);
+
+      // Character Permissions Table
+      const charTableBody = document.getElementById('characterPermsTableBody');
+      charTableBody.innerHTML = '';
+
+      if (charactersList.length === 0) {
+        charTableBody.innerHTML = `<tr><td colspan="4" style="text-align:center; color:var(--text-dim);">Nenhum personagem cadastrado.</td></tr>`;
+        return;
+      }
+
+      charactersList.forEach(char => {
+        const isOwner = (char.jogador === user.login || char.jogador === user.id);
+        const charPermEntry = (userPerm.characters || []).find(c => c.id === char.id);
+
+        const canView = isOwner || (charPermEntry ? !!charPermEntry.canView : false);
+        const canEdit = isOwner || (charPermEntry ? !!charPermEntry.canEdit : false);
+
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>
+            <strong>${escapeHtml(char.nome)}</strong>
+            <div style="font-size:0.75rem; color:var(--text-dim);">${escapeHtml(char.classe || '')} ${char.nivel ? `Nv. ${char.nivel}` : ''}</div>
+          </td>
+          <td>
+            <span style="font-size:0.85rem; color:${isOwner ? 'var(--gold)' : 'var(--text-dim)'};">
+              ${escapeHtml(char.jogador || 'Mesa')} ${isOwner ? '(Dono)' : ''}
+            </span>
+          </td>
+          <td style="text-align: center;">
+            <input type="checkbox" class="char-perm-view" data-char-id="${char.id}" ${canView ? 'checked' : ''} ${isOwner ? 'disabled' : ''}>
+          </td>
+          <td style="text-align: center;">
+            <input type="checkbox" class="char-perm-edit" data-char-id="${char.id}" ${canEdit ? 'checked' : ''} ${isOwner ? 'disabled' : ''}>
+          </td>
+        `;
+        charTableBody.appendChild(tr);
+      });
+    }
+
+    function toggleSessionPagesGroup(enabled) {
+      const container = document.getElementById('sessionSubPagesContainer');
+      if (container) {
+        container.style.opacity = enabled ? '1' : '0.5';
+        container.querySelectorAll('input').forEach(i => i.disabled = !enabled);
+      }
+    }
+
+    function saveCurrentPermissions() {
+      if (!selectedPermUserId) return;
+
+      const pages = [];
+      const hasSession = document.getElementById('permIniciarSessao').checked;
+      if (hasSession) {
+        pages.push('iniciar_sessao');
+        document.querySelectorAll('.perm-page-chk:checked').forEach(chk => {
+          pages.push(chk.value);
+        });
+      }
+
+      const characters = [];
+      document.querySelectorAll('#characterPermsTableBody tr').forEach(row => {
+        const viewChk = row.querySelector('.char-perm-view');
+        const editChk = row.querySelector('.char-perm-edit');
+        if (viewChk && editChk) {
+          const charId = viewChk.getAttribute('data-char-id');
+          characters.push({
+            id: charId,
+            canView: viewChk.checked,
+            canEdit: editChk.checked
+          });
+        }
+      });
+
+      let permsObj = {};
+      try {
+        permsObj = JSON.parse(localStorage.getItem('userPermissions')) || {};
+      } catch (e) {
+        permsObj = {};
+      }
+
+      permsObj[selectedPermUserId] = {
+        pages: pages,
+        characters: characters
+      };
+
+      localStorage.setItem('userPermissions', JSON.stringify(permsObj));
+      alert('Permissões salvas com sucesso!');
+    }
+
+    /**
+     * ==========================================
+     * PERFIL USUÁRIO (ROLE TOGGLE)
+     * ==========================================
+     */
+    function renderUserProfilesTable() {
+      const tbody = document.getElementById('userProfileRolesTableBody');
+      if (!tbody) return;
+      tbody.innerHTML = '';
+
+      const masterCount = usersList.filter(u => u.perfil === 'mestre').length;
+
+      usersList.forEach(u => {
+        const tr = document.createElement('tr');
+        const isMestre = u.perfil === 'mestre';
+        const isLastMestre = isMestre && masterCount <= 1;
+
+        const badge = isMestre 
+          ? '<span class="badge badge-mestre">Mestre</span>'
+          : '<span class="badge badge-jogador">Jogador</span>';
+
+        tr.innerHTML = `
+          <td><strong>${escapeHtml(u.nome || u.login)}</strong></td>
+          <td style="color: var(--text);">${escapeHtml(u.login)}</td>
+          <td>${badge}</td>
+          <td style="text-align: center;">
+            <label class="switch" title="${isLastMestre ? 'Não pode despromover o único mestre' : 'Alternar cargo'}">
+              <input type="checkbox" ${isMestre ? 'checked' : ''} ${isLastMestre ? 'disabled' : ''} onchange="toggleUserType('${escapeAttr(u.id)}')">
+              <span class="slider"></span>
+            </label>
+          </td>
+          <td style="text-align: right; font-size: 0.85rem; color: ${isMestre ? '#ff7675' : '#2ecc71'};">
+            ${isMestre ? 'Acesso Total' : 'Acesso Restrito'}
+          </td>
+        `;
+
+        tbody.appendChild(tr);
+      });
+    }
+
+    function toggleUserType(userId) {
+      const user = usersList.find(u => u.id === userId);
+      if (!user) return;
+
+      if (user.perfil === 'mestre') {
+        const masterCount = usersList.filter(u => u.perfil === 'mestre').length;
+        if (masterCount <= 1) {
+          alert('Ação bloqueada: Não é possível rebaixar o único Mestre da mesa!');
+          renderUserProfilesTable();
+          return;
+        }
+        if (!confirm(`Tem certeza que deseja alterar o cargo de "${user.nome || user.login}" para JOGADOR? Ele perderá acesso irrestrito.`)) {
+          renderUserProfilesTable();
+          return;
+        }
+        user.perfil = 'jogador';
+      } else {
+        if (!confirm(`AVISO: Usuários Mestre possuem acesso total a todas as opções do sistema!\nDeseja promover "${user.nome || user.login}" a MESTRE?`)) {
+          renderUserProfilesTable();
+          return;
+        }
+        user.perfil = 'mestre';
+      }
+
+      saveUsers(usersList);
+      renderUsersTable();
+      renderPermissionsList();
+      renderUserProfilesTable();
+    }
+
+    /**
+     * Modal Helpers
+     */
+    function openModal(id) {
+      const m = document.getElementById(id);
+      if (m) m.classList.add('active');
+    }
+
+    function closeModal(id) {
+      const m = document.getElementById(id);
+      if (m) m.classList.remove('active');
+    }
+
+    function escapeHtml(text) {
+      if (!text) return '';
+      return String(text)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    function escapeAttr(text) {
+      if (!text) return '';
+      return String(text).replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,1467 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mesa RPG - Personagens</title>
+  <link rel="stylesheet" href="../assets/style.css">
+  <style>
+    /* Specific styles for Personagens page */
+    .char-card-item {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      cursor: pointer;
+      position: relative;
+      transition: all 0.25s ease;
+      margin-bottom: 10px;
+      user-select: none;
+    }
+    .char-card-item:hover {
+      border-color: var(--gold);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(201, 162, 39, 0.2);
+    }
+    .char-card-item.active {
+      border-color: var(--gold);
+      background: rgba(201, 162, 39, 0.12);
+      box-shadow: 0 0 10px rgba(201, 162, 39, 0.35);
+    }
+    .char-card-thumb {
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid var(--gold);
+      background: var(--bg-dark);
+      flex-shrink: 0;
+    }
+    .char-card-info {
+      flex: 1;
+      min-width: 0;
+    }
+    .char-card-name {
+      font-weight: 700;
+      color: var(--text);
+      font-size: 0.95rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .char-card-player {
+      font-size: 0.8rem;
+      color: var(--text-dim);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .char-type-tag {
+      display: inline-block;
+      font-size: 0.65rem;
+      padding: 2px 6px;
+      border-radius: 4px;
+      background: rgba(201, 162, 39, 0.2);
+      color: var(--gold);
+      margin-left: 4px;
+    }
+    .char-locked {
+      cursor: not-allowed;
+      opacity: 0.7;
+    }
+    .char-locked::after {
+      content: '🔒 Bloqueado';
+      position: absolute;
+      inset: 0;
+      background: rgba(13, 13, 26, 0.85);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.85rem;
+      font-weight: bold;
+      color: #ff6b6b;
+      backdrop-filter: blur(2px);
+      letter-spacing: 1px;
+    }
+
+    /* Detail View Tabs & Panels */
+    .char-detail-container {
+      background: var(--bg-mid);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 24px;
+      min-height: calc(100vh - 120px);
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.6);
+    }
+    .tab-content {
+      display: none;
+      animation: fadeIn 0.3s ease;
+    }
+    .tab-content.active {
+      display: block;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Apresentação */
+    .apresentacao-grid {
+      display: grid;
+      grid-template-columns: 280px 1fr;
+      gap: 30px;
+    }
+    @media (max-width: 900px) {
+      .apresentacao-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+    .char-main-avatar-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 15px;
+      background: var(--bg-card);
+      padding: 20px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+    }
+    .char-main-avatar {
+      width: 220px;
+      height: 260px;
+      object-fit: cover;
+      border-radius: 8px;
+      border: 3px solid var(--gold);
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.7);
+    }
+
+    /* Atributos Grid */
+    .attr-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+      gap: 15px;
+      margin-bottom: 25px;
+    }
+    .attr-box {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px;
+      text-align: center;
+      position: relative;
+      transition: all 0.2s;
+    }
+    .attr-box:hover {
+      border-color: var(--gold);
+    }
+    .attr-name {
+      font-size: 0.85rem;
+      font-weight: bold;
+      color: var(--gold);
+      letter-spacing: 1px;
+    }
+    .attr-value-input {
+      width: 60px;
+      text-align: center;
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--text);
+      background: var(--bg-dark);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      margin: 6px 0;
+      padding: 4px;
+    }
+    .attr-mod {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 12px;
+      background: rgba(201, 162, 39, 0.2);
+      color: var(--gold);
+      font-size: 0.85rem;
+      font-weight: bold;
+      border: 1px solid var(--gold-dark);
+    }
+
+    /* Stats Grid */
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    .stat-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 14px;
+    }
+
+    /* Bars */
+    .bar-container {
+      margin-bottom: 16px;
+    }
+    .bar-header {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 6px;
+      font-size: 0.85rem;
+      font-weight: bold;
+    }
+
+    /* Habilidades */
+    .skill-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 16px;
+      margin-bottom: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+    }
+    .skill-type {
+      font-size: 0.75rem;
+      padding: 3px 8px;
+      border-radius: 4px;
+      text-transform: uppercase;
+      font-weight: bold;
+    }
+    .skill-type-ativo {
+      background: rgba(192, 57, 43, 0.25);
+      color: #ff7675;
+      border: 1px solid #c0392b;
+    }
+    .skill-type-passivo {
+      background: rgba(46, 204, 113, 0.25);
+      color: #2ecc71;
+      border: 1px solid #27ae60;
+    }
+
+    /* Monster Tab */
+    .monster-header-card {
+      display: flex;
+      gap: 20px;
+      align-items: center;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 16px;
+      margin-bottom: 20px;
+    }
+    .monster-thumb {
+      width: 100px;
+      height: 100px;
+      border-radius: 8px;
+      object-fit: cover;
+      border: 2px solid var(--red-light);
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 50px 20px;
+      color: var(--text-dim);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Navbar -->
+  <nav class="navbar">
+    <div class="navbar-brand">
+      <a href="../dashboard.html" class="logo">
+        <span>⚔️</span> MESA RPG
+      </a>
+      <span style="color: var(--gold); font-size: 1.1rem; border-left: 2px solid var(--border); padding-left: 14px; letter-spacing: 2px;">
+        PERSONAGENS
+      </span>
+    </div>
+    <div class="navbar-menu">
+      <a href="../dashboard.html" class="btn-ghost">
+        <span>←</span> Voltar ao Painel
+      </a>
+      <button class="btn-red" onclick="logout()" style="padding: 8px 16px; font-size: 0.85rem;">
+        Sair
+      </button>
+    </div>
+  </nav>
+
+  <!-- Main Layout With Sidebar -->
+  <div class="layout-with-sidebar">
+    <!-- Left Sidebar -->
+    <aside class="sidebar">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+        <h3 class="sidebar-title" style="margin-bottom: 0; padding-bottom: 0; border-bottom: none;">
+          Lista de Fichas
+        </h3>
+      </div>
+      <div id="mestreActionsContainer" style="margin-bottom: 16px; display: none;">
+        <button class="btn-gold" style="width: 100%; font-size: 0.85rem;" onclick="openNewCharModal()">
+          <span>➕</span> Cadastrar Novo
+        </button>
+      </div>
+      <div id="characterList" class="sidebar-menu">
+        <!-- Rendered dynamically -->
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+      <div id="characterDetailWrapper" class="char-detail-container">
+        <!-- Empty / Selected Content -->
+        <div id="emptyCharacterState" class="empty-state">
+          <div style="font-size: 3rem; margin-bottom: 12px;">🛡️</div>
+          <h2>Nenhum Personagem Selecionado</h2>
+          <p style="margin-top: 8px;">Selecione um personagem na barra lateral para visualizar e gerenciar sua ficha.</p>
+        </div>
+
+        <div id="characterDetailContent" style="display: none;">
+          <!-- Header with Name, Type & Save Status -->
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 12px; border-bottom: 1px solid var(--border); padding-bottom: 14px;">
+            <div>
+              <h2 id="detailCharNameHeader" style="margin-bottom: 4px; display: inline-block;">Nome do Personagem</h2>
+              <span id="detailCharTypeBadge" class="badge badge-jogador" style="margin-left: 10px;">Personagem</span>
+              <div id="detailCharPlayerHeader" style="font-size: 0.85rem; color: var(--text-dim); margin-top: 4px;">
+                Jogador: <strong>-</strong>
+              </div>
+            </div>
+            <div style="display: flex; gap: 10px;">
+              <button id="btnSetAsTableAvatar" class="btn-ghost" onclick="setAsTableAvatar()" title="Usa esta imagem como seu avatar na mesa">
+                <span>⭐</span> Minha Imagem na Mesa
+              </button>
+              <button id="btnSaveCharacter" class="btn-gold" onclick="saveCurrentCharacter()">
+                <span>💾</span> Salvar Alterações
+              </button>
+            </div>
+          </div>
+
+          <!-- Navigation Tabs -->
+          <div class="tab-bar">
+            <div class="tab active" data-tab="tabApresentacao" onclick="switchTab('tabApresentacao')">APRESENTAÇÃO</div>
+            <div class="tab" data-tab="tabAtributos" onclick="switchTab('tabAtributos')">ATRIBUTOS</div>
+            <div class="tab" data-tab="tabHabilidades" onclick="switchTab('tabHabilidades')">HABILIDADES</div>
+            <div class="tab" data-tab="tabMonster" onclick="switchTab('tabMonster')">MONSTER</div>
+          </div>
+
+          <!-- TAB 1: APRESENTAÇÃO -->
+          <div id="tabApresentacao" class="tab-content active">
+            <div class="apresentacao-grid">
+              <!-- Left Column: Avatar & Table Avatar Button -->
+              <div class="char-main-avatar-container">
+                <img id="detailCharAvatar" src="https://images.unsplash.com/photo-1578632767115-351597cf2477?w=300" alt="Avatar" class="char-main-avatar">
+                <div id="avatarUploadSection" style="width: 100%;">
+                  <label class="btn-ghost" style="width: 100%; cursor: pointer; text-align: center;">
+                    <span>📷</span> Alterar Imagem
+                    <input type="file" id="charAvatarInput" accept="image/*" style="display: none;" onchange="handleAvatarUpload(event)">
+                  </label>
+                  <div style="font-size: 0.75rem; color: var(--text-dim); text-align: center; margin-top: 4px;">
+                    Ou insira URL abaixo
+                  </div>
+                  <input type="text" id="charAvatarUrlInput" placeholder="URL da imagem..." class="form-group" style="width: 100%; margin-top: 6px; padding: 6px; font-size: 0.8rem; background: var(--bg-dark); border: 1px solid var(--border); color: var(--text); border-radius: 4px;" onchange="handleAvatarUrlChange(this.value)">
+                </div>
+              </div>
+
+              <!-- Right Column: Basic Information & Backstory -->
+              <div>
+                <div class="grid-2" style="margin-bottom: 16px;">
+                  <div class="form-group">
+                    <label>NOME DO PERSONAGEM</label>
+                    <input type="text" id="detailInputNome" placeholder="Ex: Thorne Sombra-da-Noite">
+                  </div>
+                  <div class="form-group">
+                    <label>JOGADOR RESPONSÁVEL</label>
+                    <select id="detailSelectJogador">
+                      <!-- Populated dynamically -->
+                    </select>
+                  </div>
+                </div>
+
+                <div class="grid-3" style="margin-bottom: 16px;">
+                  <div class="form-group">
+                    <label>CLASSE</label>
+                    <input type="text" id="detailInputClasse" placeholder="Ex: Ladino">
+                  </div>
+                  <div class="form-group">
+                    <label>RAÇA</label>
+                    <input type="text" id="detailInputRaca" placeholder="Ex: Elfo da Floresta">
+                  </div>
+                  <div class="form-group">
+                    <label>NÍVEL</label>
+                    <input type="number" id="detailInputNivel" min="1" max="30" value="1">
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <label>HISTÓRIA E BIOGRAFIA (BACKSTORY)</label>
+                  <textarea id="detailInputHistoria" rows="9" placeholder="Conte a história, origens, objetivos e motivações deste personagem..."></textarea>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- TAB 2: ATRIBUTOS -->
+          <div id="tabAtributos" class="tab-content">
+            <!-- Vitals: HP & Mana Bars -->
+            <div class="grid-2" style="margin-bottom: 24px;">
+              <div class="card card-red" style="padding: 16px;">
+                <div class="bar-header">
+                  <span style="color: #ff7675;">❤️ PONTOS DE VIDA (HP)</span>
+                  <div style="display: flex; align-items: center; gap: 6px;">
+                    <input type="number" id="detailHpAtual" style="width: 65px; padding: 4px; text-align: center; background: var(--bg-dark); border: 1px solid var(--border); color: var(--text); border-radius: 4px;" onchange="updateBars()">
+                    <span>/</span>
+                    <input type="number" id="detailHpMax" style="width: 65px; padding: 4px; text-align: center; background: var(--bg-dark); border: 1px solid var(--border); color: var(--text); border-radius: 4px;" onchange="updateBars()">
+                  </div>
+                </div>
+                <div class="hp-bar" style="height: 16px;">
+                  <div id="detailHpFill" class="hp-fill" style="width: 100%;"></div>
+                </div>
+              </div>
+
+              <div class="card" style="padding: 16px; border-color: #1a6eb5;">
+                <div class="bar-header">
+                  <span style="color: #54a0ff;">🔮 PONTOS DE MANA (MP)</span>
+                  <div style="display: flex; align-items: center; gap: 6px;">
+                    <input type="number" id="detailManaAtual" style="width: 65px; padding: 4px; text-align: center; background: var(--bg-dark); border: 1px solid var(--border); color: var(--text); border-radius: 4px;" onchange="updateBars()">
+                    <span>/</span>
+                    <input type="number" id="detailManaMax" style="width: 65px; padding: 4px; text-align: center; background: var(--bg-dark); border: 1px solid var(--border); color: var(--text); border-radius: 4px;" onchange="updateBars()">
+                  </div>
+                </div>
+                <div class="hp-bar" style="height: 16px;">
+                  <div id="detailManaFill" class="mana-fill" style="width: 100%;"></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 6 Core Attributes Grid -->
+            <h3 style="margin-bottom: 12px;">Atributos Principais</h3>
+            <div class="attr-grid">
+              <div class="attr-box">
+                <div class="attr-name">FOR</div>
+                <div style="font-size: 0.75rem; color: var(--text-dim);">Força</div>
+                <input type="number" id="attrForca" class="attr-value-input" value="10" oninput="recalcMods()">
+                <div><span class="attr-mod" id="modForca">+0</span></div>
+              </div>
+              <div class="attr-box">
+                <div class="attr-name">DES</div>
+                <div style="font-size: 0.75rem; color: var(--text-dim);">Destreza</div>
+                <input type="number" id="attrDestreza" class="attr-value-input" value="10" oninput="recalcMods()">
+                <div><span class="attr-mod" id="modDestreza">+0</span></div>
+              </div>
+              <div class="attr-box">
+                <div class="attr-name">CON</div>
+                <div style="font-size: 0.75rem; color: var(--text-dim);">Constituição</div>
+                <input type="number" id="attrConstituicao" class="attr-value-input" value="10" oninput="recalcMods()">
+                <div><span class="attr-mod" id="modConstituicao">+0</span></div>
+              </div>
+              <div class="attr-box">
+                <div class="attr-name">INT</div>
+                <div style="font-size: 0.75rem; color: var(--text-dim);">Inteligência</div>
+                <input type="number" id="attrInteligencia" class="attr-value-input" value="10" oninput="recalcMods()">
+                <div><span class="attr-mod" id="modInteligencia">+0</span></div>
+              </div>
+              <div class="attr-box">
+                <div class="attr-name">SAB</div>
+                <div style="font-size: 0.75rem; color: var(--text-dim);">Sabedoria</div>
+                <input type="number" id="attrSabedoria" class="attr-value-input" value="10" oninput="recalcMods()">
+                <div><span class="attr-mod" id="modSabedoria">+0</span></div>
+              </div>
+              <div class="attr-box">
+                <div class="attr-name">CAR</div>
+                <div style="font-size: 0.75rem; color: var(--text-dim);">Carisma</div>
+                <input type="number" id="attrCarisma" class="attr-value-input" value="10" oninput="recalcMods()">
+                <div><span class="attr-mod" id="modCarisma">+0</span></div>
+              </div>
+            </div>
+
+            <!-- Movement, Initiative, AC -->
+            <h3 style="margin-bottom: 12px;">Combate & Mobilidade</h3>
+            <div class="stats-row">
+              <div class="stat-card">
+                <label style="color: var(--gold); font-size: 0.8rem; font-weight: bold; display: block; margin-bottom: 6px;">CLASSE DE ARMADURA (CA)</label>
+                <input type="number" id="detailCa" value="10" style="width: 100%; font-size: 1.2rem; font-weight: bold; background: var(--bg-dark); border: 1px solid var(--border); color: var(--text); padding: 8px; border-radius: 6px; text-align: center;">
+              </div>
+              <div class="stat-card">
+                <label style="color: var(--gold); font-size: 0.8rem; font-weight: bold; display: block; margin-bottom: 6px;">INICIATIVA</label>
+                <input type="text" id="detailIniciativa" value="+0" style="width: 100%; font-size: 1.2rem; font-weight: bold; background: var(--bg-dark); border: 1px solid var(--border); color: var(--text); padding: 8px; border-radius: 6px; text-align: center;">
+              </div>
+              <div class="stat-card">
+                <label style="color: var(--gold); font-size: 0.8rem; font-weight: bold; display: block; margin-bottom: 6px;">DESLOCAMENTO</label>
+                <input type="text" id="detailDeslocamento" value="9m" style="width: 100%; font-size: 1.2rem; font-weight: bold; background: var(--bg-dark); border: 1px solid var(--border); color: var(--text); padding: 8px; border-radius: 6px; text-align: center;">
+              </div>
+            </div>
+
+            <div style="text-align: right; margin-top: 20px;">
+              <button class="btn-gold" onclick="saveCurrentCharacter()">
+                <span>💾</span> Salvar Atributos
+              </button>
+            </div>
+          </div>
+
+          <!-- TAB 3: HABILIDADES -->
+          <div id="tabHabilidades" class="tab-content">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+              <h3>Habilidades e Feitiços</h3>
+              <button id="btnAddSkillBtn" class="btn-gold" style="font-size: 0.85rem;" onclick="openSkillModal()">
+                <span>➕</span> Nova Habilidade
+              </button>
+            </div>
+
+            <div id="skillsListContainer">
+              <!-- Rendered dynamically -->
+            </div>
+          </div>
+
+          <!-- TAB 4: MONSTER -->
+          <div id="tabMonster" class="tab-content">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+              <div>
+                <h3>Companheiro / Mini-Summon</h3>
+                <p style="font-size: 0.85rem; color: var(--text-dim);">Familiar, invocação mágica ou mascote do personagem.</p>
+              </div>
+              <button id="btnSaveMonster" class="btn-gold" style="font-size: 0.85rem;" onclick="saveCurrentCharacter()">
+                <span>💾</span> Salvar Mascote
+              </button>
+            </div>
+
+            <div class="monster-header-card">
+              <img id="monsterAvatar" src="https://images.unsplash.com/photo-1534447677768-be436bb09401?w=200" alt="Mascote" class="monster-thumb">
+              <div style="flex: 1;">
+                <div class="grid-2" style="margin-bottom: 10px;">
+                  <div class="form-group" style="margin-bottom: 0;">
+                    <label>NOME DO MONSTRO / MASCOTE</label>
+                    <input type="text" id="monsterNome" placeholder="Ex: Lobo Espectral">
+                  </div>
+                  <div class="form-group" style="margin-bottom: 0;">
+                    <label>URL DA IMAGEM DO MASCOTE</label>
+                    <input type="text" id="monsterAvatarUrl" placeholder="https://..." onchange="updateMonsterImg(this.value)">
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Monster Vitals -->
+            <div class="grid-2" style="margin-bottom: 20px;">
+              <div class="card card-red" style="padding: 12px;">
+                <div class="bar-header">
+                  <span style="color: #ff7675;">HP DO MASCOTE</span>
+                  <div style="display: flex; align-items: center; gap: 4px;">
+                    <input type="number" id="monsterHpAtual" style="width: 55px; text-align: center; background: var(--bg-dark); border: 1px solid var(--border); color: var(--text); border-radius: 4px;" onchange="updateMonsterBars()">
+                    <span>/</span>
+                    <input type="number" id="monsterHpMax" style="width: 55px; text-align: center; background: var(--bg-dark); border: 1px solid var(--border); color: var(--text); border-radius: 4px;" onchange="updateMonsterBars()">
+                  </div>
+                </div>
+                <div class="hp-bar" style="height: 12px;">
+                  <div id="monsterHpFill" class="hp-fill" style="width: 100%;"></div>
+                </div>
+              </div>
+
+              <div class="card" style="padding: 12px; border-color: #1a6eb5;">
+                <div class="bar-header">
+                  <span style="color: #54a0ff;">MANA DO MASCOTE</span>
+                  <div style="display: flex; align-items: center; gap: 4px;">
+                    <input type="number" id="monsterManaAtual" style="width: 55px; text-align: center; background: var(--bg-dark); border: 1px solid var(--border); color: var(--text); border-radius: 4px;" onchange="updateMonsterBars()">
+                    <span>/</span>
+                    <input type="number" id="monsterManaMax" style="width: 55px; text-align: center; background: var(--bg-dark); border: 1px solid var(--border); color: var(--text); border-radius: 4px;" onchange="updateMonsterBars()">
+                  </div>
+                </div>
+                <div class="hp-bar" style="height: 12px;">
+                  <div id="monsterManaFill" class="mana-fill" style="width: 100%;"></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Monster Attributes -->
+            <h4 style="margin-bottom: 10px;">Atributos do Mascote</h4>
+            <div class="attr-grid" style="margin-bottom: 20px;">
+              <div class="attr-box">
+                <div class="attr-name">FOR</div>
+                <input type="number" id="mAttrForca" class="attr-value-input" value="10" oninput="recalcMonsterMods()">
+                <div><span class="attr-mod" id="mModForca">+0</span></div>
+              </div>
+              <div class="attr-box">
+                <div class="attr-name">DES</div>
+                <input type="number" id="mAttrDestreza" class="attr-value-input" value="10" oninput="recalcMonsterMods()">
+                <div><span class="attr-mod" id="mModDestreza">+0</span></div>
+              </div>
+              <div class="attr-box">
+                <div class="attr-name">CON</div>
+                <input type="number" id="mAttrConstituicao" class="attr-value-input" value="10" oninput="recalcMonsterMods()">
+                <div><span class="attr-mod" id="mModConstituicao">+0</span></div>
+              </div>
+              <div class="attr-box">
+                <div class="attr-name">INT</div>
+                <input type="number" id="mAttrInteligencia" class="attr-value-input" value="10" oninput="recalcMonsterMods()">
+                <div><span class="attr-mod" id="mModInteligencia">+0</span></div>
+              </div>
+              <div class="attr-box">
+                <div class="attr-name">SAB</div>
+                <input type="number" id="mAttrSabedoria" class="attr-value-input" value="10" oninput="recalcMonsterMods()">
+                <div><span class="attr-mod" id="mModSabedoria">+0</span></div>
+              </div>
+              <div class="attr-box">
+                <div class="attr-name">CAR</div>
+                <input type="number" id="mAttrCarisma" class="attr-value-input" value="10" oninput="recalcMonsterMods()">
+                <div><span class="attr-mod" id="mModCarisma">+0</span></div>
+              </div>
+            </div>
+
+            <!-- Monster Abilities -->
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+              <h4>Habilidades da Mascote</h4>
+              <button id="btnAddMonsterSkillBtn" class="btn-ghost" style="padding: 6px 14px; font-size: 0.8rem;" onclick="openMonsterSkillModal()">
+                <span>➕</span> Adicionar Habilidade Mascote
+              </button>
+            </div>
+            <div id="monsterSkillsList">
+              <!-- Rendered dynamically -->
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- MODAL: CADASTRAR NOVO PERSONAGEM -->
+  <div id="modalNewCharacter" class="modal-overlay">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3 style="margin: 0;">Cadastrar Nova Ficha</h3>
+        <button class="modal-close" onclick="closeModal('modalNewCharacter')">&times;</button>
+      </div>
+      <form id="formNewCharacter" onsubmit="handleCreateNewCharacter(event)">
+        <div class="form-group">
+          <label>NOME</label>
+          <input type="text" id="newCharNome" required placeholder="Nome do personagem ou criatura">
+        </div>
+        <div class="grid-2">
+          <div class="form-group">
+            <label>TIPO</label>
+            <select id="newCharTipo">
+              <option value="Personagem">Personagem</option>
+              <option value="NPC">NPC</option>
+              <option value="Monstro">Monstro</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>ATRIBUIR AO JOGADOR</label>
+            <select id="newCharJogador">
+              <!-- Populated dynamically -->
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>URL DA IMAGEM / AVATAR</label>
+          <input type="text" id="newCharAvatarUrl" placeholder="https://exemplo.com/foto.jpg">
+          <div style="margin-top: 6px;">
+            <label class="btn-ghost" style="font-size: 0.75rem; padding: 4px 10px; cursor: pointer;">
+              <span>📁</span> Carregar do Computador
+              <input type="file" id="newCharAvatarFile" accept="image/*" style="display: none;" onchange="handleNewCharAvatarFile(event)">
+            </label>
+          </div>
+        </div>
+        <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px;">
+          <button type="button" class="btn-ghost" onclick="closeModal('modalNewCharacter')">Cancelar</button>
+          <button type="submit" class="btn-gold">Criar Ficha</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: NOVA HABILIDADE / EDITAR HABILIDADE -->
+  <div id="modalSkill" class="modal-overlay">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3 id="skillModalTitle" style="margin: 0;">Nova Habilidade</h3>
+        <button class="modal-close" onclick="closeModal('modalSkill')">&times;</button>
+      </div>
+      <form id="formSkill" onsubmit="handleSaveSkill(event)">
+        <input type="hidden" id="skillEditIndex" value="-1">
+        <input type="hidden" id="skillTargetType" value="character"> <!-- 'character' or 'monster' -->
+        <div class="form-group">
+          <label>NOME DA HABILIDADE</label>
+          <input type="text" id="skillInputNome" required placeholder="Ex: Ataque Furtivo, Bola de Fogo">
+        </div>
+        <div class="grid-2">
+          <div class="form-group">
+            <label>TIPO</label>
+            <select id="skillInputTipo">
+              <option value="ativo">Ativo</option>
+              <option value="passivo">Passivo</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>NÍVEL REQUERIDO</label>
+            <input type="number" id="skillInputNivel" min="1" max="30" value="1">
+          </div>
+        </div>
+        <div class="form-group">
+          <label>DANO / EFEITO</label>
+          <input type="text" id="skillInputDano" placeholder="Ex: 2d6 + 3 perfurante, +2 na CA passiva">
+        </div>
+        <div class="form-group">
+          <label>DESCRIÇÃO COMPLETA</label>
+          <textarea id="skillInputDesc" rows="4" placeholder="Descreva como funciona a habilidade..."></textarea>
+        </div>
+        <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px;">
+          <button type="button" class="btn-ghost" onclick="closeModal('modalSkill')">Cancelar</button>
+          <button type="submit" class="btn-gold">Salvar Habilidade</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Global Auth and Logic Scripts -->
+  <script src="../assets/auth.js"></script>
+  <script>
+    // State Variables
+    let currentUser = null;
+    let charactersList = [];
+    let selectedCharId = null;
+    let selectedChar = null;
+
+    // Run Auth Verification
+    document.addEventListener('DOMContentLoaded', () => {
+      currentUser = requireAuth();
+      if (!currentUser) return;
+
+      // Show "Cadastrar Novo" if Master
+      if (currentUser.perfil === 'mestre') {
+        const mestreBtn = document.getElementById('mestreActionsContainer');
+        if (mestreBtn) mestreBtn.style.display = 'block';
+      }
+
+      loadCharacters();
+      populateUserDropdowns();
+
+      // Check if a specific character was requested in URL parameter (?id=xxx)
+      const urlParams = new URLSearchParams(window.location.search);
+      const reqId = urlParams.get('id');
+      if (reqId && charactersList.some(c => c.id === reqId)) {
+        selectCharacter(reqId);
+      } else if (charactersList.length > 0) {
+        // Auto-select first accessible character
+        const firstAccessible = charactersList.find(c => checkPermission(c.id, 'view'));
+        if (firstAccessible) {
+          selectCharacter(firstAccessible.id);
+        }
+      }
+    });
+
+    /**
+     * Check permission for a character
+     * Returns true if user is Mestre, or owner of character, or explicitly granted in userPermissions
+     */
+    function checkPermission(charId, mode = 'view') {
+      if (!currentUser) return false;
+      if (currentUser.perfil === 'mestre') return true;
+
+      const char = charactersList.find(c => c.id === charId);
+      if (!char) return false;
+
+      // Check direct ownership
+      if (char.jogador === currentUser.login || char.jogador === currentUser.nome || char.jogador === currentUser.id) {
+        return true;
+      }
+
+      // Check explicit permissions in localStorage
+      try {
+        const rawPerms = localStorage.getItem('userPermissions');
+        if (rawPerms) {
+          const permsObj = JSON.parse(rawPerms);
+          const userPerms = permsObj[currentUser.id] || permsObj[currentUser.login];
+          if (userPerms && Array.isArray(userPerms.characters)) {
+            const entry = userPerms.characters.find(item => item.id === charId);
+            if (entry) {
+              if (mode === 'edit') return !!entry.canEdit;
+              return !!(entry.canView || entry.canEdit);
+            }
+          }
+        }
+      } catch (e) {
+        console.error('Error reading permissions:', e);
+      }
+
+      return false;
+    }
+
+    /**
+     * Load characters from localStorage
+     */
+    function loadCharacters() {
+      charactersList = getCharacters();
+      renderCharacterList();
+    }
+
+    /**
+     * Render Left Sidebar List
+     */
+    function renderCharacterList() {
+      const container = document.getElementById('characterList');
+      if (!container) return;
+      container.innerHTML = '';
+
+      if (charactersList.length === 0) {
+        container.innerHTML = '<div style="color:var(--text-dim); font-size:0.85rem; padding:10px;">Nenhum personagem cadastrado.</div>';
+        return;
+      }
+
+      charactersList.forEach(char => {
+        const canView = checkPermission(char.id, 'view');
+        const isSelected = char.id === selectedCharId;
+
+        const card = document.createElement('div');
+        card.className = `char-card-item ${isSelected ? 'active' : ''} ${!canView ? 'char-locked' : ''}`;
+        card.onclick = () => {
+          if (!canView) {
+            alert('Acesso Restrito: Você não possui permissão para visualizar este personagem.');
+            return;
+          }
+          selectCharacter(char.id);
+        };
+
+        const thumb = char.avatar || 'https://images.unsplash.com/photo-1578632767115-351597cf2477?w=150';
+        const typeTag = char.tipo ? `<span class="char-type-tag">${escapeHtml(char.tipo)}</span>` : '';
+
+        card.innerHTML = `
+          <img src="${thumb}" alt="${escapeHtml(char.nome)}" class="char-card-thumb" onerror="this.src='https://images.unsplash.com/photo-1578632767115-351597cf2477?w=150'">
+          <div class="char-card-info">
+            <div class="char-card-name">${escapeHtml(char.nome)} ${typeTag}</div>
+            <div class="char-card-player">
+              <span>👤</span> ${escapeHtml(char.jogador || 'Mesa')}
+            </div>
+          </div>
+        `;
+
+        container.appendChild(card);
+      });
+    }
+
+    /**
+     * Select character and display details
+     */
+    function selectCharacter(id) {
+      selectedCharId = id;
+      selectedChar = charactersList.find(c => c.id === id);
+
+      // Re-render list to highlight active
+      renderCharacterList();
+
+      if (!selectedChar) {
+        document.getElementById('emptyCharacterState').style.display = 'block';
+        document.getElementById('characterDetailContent').style.display = 'none';
+        return;
+      }
+
+      document.getElementById('emptyCharacterState').style.display = 'none';
+      document.getElementById('characterDetailContent').style.display = 'block';
+
+      renderCharacterDetail(selectedChar);
+    }
+
+    /**
+     * Render Character Detail View
+     */
+    function renderCharacterDetail(char) {
+      const canEdit = checkPermission(char.id, 'edit');
+
+      // Header
+      document.getElementById('detailCharNameHeader').textContent = char.nome || 'Sem Nome';
+      const typeBadge = document.getElementById('detailCharTypeBadge');
+      typeBadge.textContent = char.tipo || 'Personagem';
+      if (char.tipo === 'NPC') {
+        typeBadge.className = 'badge';
+        typeBadge.style.background = '#d35400';
+      } else if (char.tipo === 'Monstro') {
+        typeBadge.className = 'badge badge-mestre';
+      } else {
+        typeBadge.className = 'badge badge-jogador';
+      }
+
+      document.getElementById('detailCharPlayerHeader').innerHTML = `Jogador: <strong>${escapeHtml(char.jogador || 'Mesa')}</strong>`;
+
+      // Form Elements - Readonly/Disabled if not permitted
+      const editableInputs = [
+        'detailInputNome', 'detailSelectJogador', 'detailInputClasse', 'detailInputRaca', 'detailInputNivel',
+        'detailInputHistoria', 'detailHpAtual', 'detailHpMax', 'detailManaAtual', 'detailManaMax',
+        'attrForca', 'attrDestreza', 'attrConstituicao', 'attrInteligencia', 'attrSabedoria', 'attrCarisma',
+        'detailCa', 'detailIniciativa', 'detailDeslocamento', 'charAvatarUrlInput',
+        'monsterNome', 'monsterAvatarUrl', 'monsterHpAtual', 'monsterHpMax', 'monsterManaAtual', 'monsterManaMax',
+        'mAttrForca', 'mAttrDestreza', 'mAttrConstituicao', 'mAttrInteligencia', 'mAttrSabedoria', 'mAttrCarisma'
+      ];
+
+      editableInputs.forEach(inputId => {
+        const el = document.getElementById(inputId);
+        if (el) el.disabled = !canEdit;
+      });
+
+      // Hide save buttons / upload buttons if not permitted to edit
+      document.getElementById('btnSaveCharacter').style.display = canEdit ? 'inline-flex' : 'none';
+      document.getElementById('btnSaveMonster').style.display = canEdit ? 'inline-flex' : 'none';
+      document.getElementById('avatarUploadSection').style.display = canEdit ? 'block' : 'none';
+      document.getElementById('btnAddSkillBtn').style.display = canEdit ? 'inline-flex' : 'none';
+      document.getElementById('btnAddMonsterSkillBtn').style.display = canEdit ? 'inline-flex' : 'none';
+
+      // TAB 1: APRESENTAÇÃO
+      const avatarSrc = char.avatar || 'https://images.unsplash.com/photo-1578632767115-351597cf2477?w=300';
+      document.getElementById('detailCharAvatar').src = avatarSrc;
+      document.getElementById('charAvatarUrlInput').value = char.avatar || '';
+      document.getElementById('detailInputNome').value = char.nome || '';
+      document.getElementById('detailSelectJogador').value = char.jogador || '';
+      document.getElementById('detailInputClasse').value = char.classe || '';
+      document.getElementById('detailInputRaca').value = char.raca || '';
+      document.getElementById('detailInputNivel').value = char.nivel || 1;
+      document.getElementById('detailInputHistoria').value = char.notas || char.historia || '';
+
+      // TAB 2: ATRIBUTOS
+      document.getElementById('detailHpAtual').value = char.hpAtual ?? 20;
+      document.getElementById('detailHpMax').value = char.hpMax ?? 20;
+      document.getElementById('detailManaAtual').value = char.manaAtual ?? 10;
+      document.getElementById('detailManaMax').value = char.manaMax ?? 10;
+      updateBars();
+
+      document.getElementById('attrForca').value = char.forca ?? 10;
+      document.getElementById('attrDestreza').value = char.destreza ?? 10;
+      document.getElementById('attrConstituicao').value = char.constituicao ?? 10;
+      document.getElementById('attrInteligencia').value = char.inteligencia ?? 10;
+      document.getElementById('attrSabedoria').value = char.sabedoria ?? 10;
+      document.getElementById('attrCarisma').value = char.carisma ?? 10;
+      recalcMods();
+
+      document.getElementById('detailCa').value = char.ca ?? 10;
+      document.getElementById('detailIniciativa').value = char.iniciativa ?? '+0';
+      document.getElementById('detailDeslocamento').value = char.deslocamento ?? '9m';
+
+      // TAB 3: HABILIDADES
+      renderSkillsList(char.habilidades || [], canEdit);
+
+      // TAB 4: MONSTER
+      const monster = char.monster || {
+        nome: 'Mini Invocação',
+        avatar: 'https://images.unsplash.com/photo-1534447677768-be436bb09401?w=200',
+        hpAtual: 10,
+        hpMax: 10,
+        manaAtual: 5,
+        manaMax: 5,
+        forca: 8,
+        destreza: 14,
+        constituicao: 10,
+        inteligencia: 6,
+        sabedoria: 12,
+        carisma: 8,
+        habilidades: []
+      };
+
+      document.getElementById('monsterNome').value = monster.nome || '';
+      document.getElementById('monsterAvatar').src = monster.avatar || 'https://images.unsplash.com/photo-1534447677768-be436bb09401?w=200';
+      document.getElementById('monsterAvatarUrl').value = monster.avatar || '';
+      document.getElementById('monsterHpAtual').value = monster.hpAtual ?? 10;
+      document.getElementById('monsterHpMax').value = monster.hpMax ?? 10;
+      document.getElementById('monsterManaAtual').value = monster.manaAtual ?? 5;
+      document.getElementById('monsterManaMax').value = monster.manaMax ?? 5;
+      updateMonsterBars();
+
+      document.getElementById('mAttrForca').value = monster.forca ?? 8;
+      document.getElementById('mAttrDestreza').value = monster.destreza ?? 14;
+      document.getElementById('mAttrConstituicao').value = monster.constituicao ?? 10;
+      document.getElementById('mAttrInteligencia').value = monster.inteligencia ?? 6;
+      document.getElementById('mAttrSabedoria').value = monster.sabedoria ?? 12;
+      document.getElementById('mAttrCarisma').value = monster.carisma ?? 8;
+      recalcMonsterMods();
+
+      renderMonsterSkillsList(monster.habilidades || [], canEdit);
+    }
+
+    /**
+     * Recalculate Modifiers for core 6 attributes: floor((val - 10) / 2)
+     */
+    function formatMod(val) {
+      const mod = Math.floor((parseInt(val || 10, 10) - 10) / 2);
+      return mod >= 0 ? `+${mod}` : `${mod}`;
+    }
+
+    function recalcMods() {
+      document.getElementById('modForca').textContent = formatMod(document.getElementById('attrForca').value);
+      document.getElementById('modDestreza').textContent = formatMod(document.getElementById('attrDestreza').value);
+      document.getElementById('modConstituicao').textContent = formatMod(document.getElementById('attrConstituicao').value);
+      document.getElementById('modInteligencia').textContent = formatMod(document.getElementById('attrInteligencia').value);
+      document.getElementById('modSabedoria').textContent = formatMod(document.getElementById('attrSabedoria').value);
+      document.getElementById('modCarisma').textContent = formatMod(document.getElementById('attrCarisma').value);
+    }
+
+    function recalcMonsterMods() {
+      document.getElementById('mModForca').textContent = formatMod(document.getElementById('mAttrForca').value);
+      document.getElementById('mModDestreza').textContent = formatMod(document.getElementById('mAttrDestreza').value);
+      document.getElementById('mModConstituicao').textContent = formatMod(document.getElementById('mAttrConstituicao').value);
+      document.getElementById('mModInteligencia').textContent = formatMod(document.getElementById('mAttrInteligencia').value);
+      document.getElementById('mModSabedoria').textContent = formatMod(document.getElementById('mAttrSabedoria').value);
+      document.getElementById('mModCarisma').textContent = formatMod(document.getElementById('mAttrCarisma').value);
+    }
+
+    /**
+     * Update HP & Mana Fill Percentages
+     */
+    function updateBars() {
+      const hpCur = Math.max(0, parseInt(document.getElementById('detailHpAtual').value || 0, 10));
+      const hpMax = Math.max(1, parseInt(document.getElementById('detailHpMax').value || 1, 10));
+      const hpPct = Math.min(100, Math.round((hpCur / hpMax) * 100));
+      document.getElementById('detailHpFill').style.width = `${hpPct}%`;
+
+      const manaCur = Math.max(0, parseInt(document.getElementById('detailManaAtual').value || 0, 10));
+      const manaMax = Math.max(1, parseInt(document.getElementById('detailManaMax').value || 1, 10));
+      const manaPct = Math.min(100, Math.round((manaCur / manaMax) * 100));
+      document.getElementById('detailManaFill').style.width = `${manaPct}%`;
+    }
+
+    function updateMonsterBars() {
+      const hpCur = Math.max(0, parseInt(document.getElementById('monsterHpAtual').value || 0, 10));
+      const hpMax = Math.max(1, parseInt(document.getElementById('monsterHpMax').value || 1, 10));
+      const hpPct = Math.min(100, Math.round((hpCur / hpMax) * 100));
+      document.getElementById('monsterHpFill').style.width = `${hpPct}%`;
+
+      const manaCur = Math.max(0, parseInt(document.getElementById('monsterManaAtual').value || 0, 10));
+      const manaMax = Math.max(1, parseInt(document.getElementById('monsterManaMax').value || 1, 10));
+      const manaPct = Math.min(100, Math.round((manaCur / manaMax) * 100));
+      document.getElementById('monsterManaFill').style.width = `${manaPct}%`;
+    }
+
+    function updateMonsterImg(url) {
+      if (url) {
+        document.getElementById('monsterAvatar').src = url;
+      }
+    }
+
+    /**
+     * Tab Switcher
+     */
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+
+      const activeTabBtn = document.querySelector(`.tab[data-tab="${tabId}"]`);
+      if (activeTabBtn) activeTabBtn.classList.add('active');
+
+      const targetContent = document.getElementById(tabId);
+      if (targetContent) targetContent.classList.add('active');
+    }
+
+    /**
+     * Save Character Data
+     */
+    function saveCurrentCharacter() {
+      if (!selectedChar) return;
+      if (!checkPermission(selectedChar.id, 'edit')) {
+        alert('Você não tem permissão para editar este personagem.');
+        return;
+      }
+
+      selectedChar.nome = document.getElementById('detailInputNome').value.trim() || selectedChar.nome;
+      selectedChar.jogador = document.getElementById('detailSelectJogador').value;
+      selectedChar.classe = document.getElementById('detailInputClasse').value.trim();
+      selectedChar.raca = document.getElementById('detailInputRaca').value.trim();
+      selectedChar.nivel = parseInt(document.getElementById('detailInputNivel').value || 1, 10);
+      selectedChar.notas = document.getElementById('detailInputHistoria').value;
+      selectedChar.historia = selectedChar.notas;
+
+      selectedChar.hpAtual = parseInt(document.getElementById('detailHpAtual').value || 0, 10);
+      selectedChar.hpMax = parseInt(document.getElementById('detailHpMax').value || 1, 10);
+      selectedChar.manaAtual = parseInt(document.getElementById('detailManaAtual').value || 0, 10);
+      selectedChar.manaMax = parseInt(document.getElementById('detailManaMax').value || 1, 10);
+
+      selectedChar.forca = parseInt(document.getElementById('attrForca').value || 10, 10);
+      selectedChar.destreza = parseInt(document.getElementById('attrDestreza').value || 10, 10);
+      selectedChar.constituicao = parseInt(document.getElementById('attrConstituicao').value || 10, 10);
+      selectedChar.inteligencia = parseInt(document.getElementById('attrInteligencia').value || 10, 10);
+      selectedChar.sabedoria = parseInt(document.getElementById('attrSabedoria').value || 10, 10);
+      selectedChar.carisma = parseInt(document.getElementById('attrCarisma').value || 10, 10);
+
+      selectedChar.ca = parseInt(document.getElementById('detailCa').value || 10, 10);
+      selectedChar.iniciativa = document.getElementById('detailIniciativa').value;
+      selectedChar.deslocamento = document.getElementById('detailDeslocamento').value;
+
+      // Monster info
+      selectedChar.monster = {
+        nome: document.getElementById('monsterNome').value.trim() || 'Mascote',
+        avatar: document.getElementById('monsterAvatarUrl').value || document.getElementById('monsterAvatar').src,
+        hpAtual: parseInt(document.getElementById('monsterHpAtual').value || 0, 10),
+        hpMax: parseInt(document.getElementById('monsterHpMax').value || 1, 10),
+        manaAtual: parseInt(document.getElementById('monsterManaAtual').value || 0, 10),
+        manaMax: parseInt(document.getElementById('monsterManaMax').value || 1, 10),
+        forca: parseInt(document.getElementById('mAttrForca').value || 10, 10),
+        destreza: parseInt(document.getElementById('mAttrDestreza').value || 10, 10),
+        constituicao: parseInt(document.getElementById('mAttrConstituicao').value || 10, 10),
+        inteligencia: parseInt(document.getElementById('mAttrInteligencia').value || 10, 10),
+        sabedoria: parseInt(document.getElementById('mAttrSabedoria').value || 10, 10),
+        carisma: parseInt(document.getElementById('mAttrCarisma').value || 10, 10),
+        habilidades: selectedChar.monster?.habilidades || []
+      };
+
+      saveCharacter(selectedChar);
+    }
+
+    function saveCharacter(char) {
+      const idx = charactersList.findIndex(c => c.id === char.id);
+      if (idx !== -1) {
+        charactersList[idx] = char;
+      } else {
+        charactersList.push(char);
+      }
+      saveCharacters(charactersList);
+      renderCharacterList();
+      renderCharacterDetail(char);
+
+      // Toast feedback
+      alert('Personagem salvo com sucesso!');
+    }
+
+    /**
+     * 'Selecionar como Minha Imagem na Mesa'
+     * Saves selected character avatar directly to currentUser's profile in sessionStorage/localStorage
+     */
+    function setAsTableAvatar() {
+      if (!selectedChar || !currentUser) return;
+      const avatarUrl = selectedChar.avatar || document.getElementById('detailCharAvatar').src;
+      currentUser.mesaAvatar = avatarUrl;
+      currentUser.avatar = avatarUrl;
+
+      // Update current user in sessionStorage
+      sessionStorage.setItem('currentUser', JSON.stringify(currentUser));
+
+      // Update in localStorage users array
+      const allUsers = getUsers();
+      const uIdx = allUsers.findIndex(u => u.id === currentUser.id || u.login === currentUser.login);
+      if (uIdx !== -1) {
+        allUsers[uIdx].mesaAvatar = avatarUrl;
+        allUsers[uIdx].avatar = avatarUrl;
+        saveUsers(allUsers);
+      }
+
+      alert('Imagem definida com sucesso como sua foto oficial na mesa e no HUB!');
+    }
+
+    /**
+     * Handle Avatar Upload and Base64 conversion
+     */
+    function handleAvatarUpload(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const base64 = e.target.result;
+        document.getElementById('detailCharAvatar').src = base64;
+        document.getElementById('charAvatarUrlInput').value = base64;
+        if (selectedChar) {
+          selectedChar.avatar = base64;
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function handleAvatarUrlChange(val) {
+      if (val && val.trim()) {
+        document.getElementById('detailCharAvatar').src = val.trim();
+        if (selectedChar) {
+          selectedChar.avatar = val.trim();
+        }
+      }
+    }
+
+    /**
+     * Skills Management (Habilidades)
+     */
+    function renderSkillsList(skills, canEdit) {
+      const container = document.getElementById('skillsListContainer');
+      if (!container) return;
+      container.innerHTML = '';
+
+      if (!skills || skills.length === 0) {
+        container.innerHTML = '<div style="color:var(--text-dim); padding:16px; text-align:center;">Nenhuma habilidade registrada para este personagem.</div>';
+        return;
+      }
+
+      skills.forEach((skill, index) => {
+        const card = document.createElement('div');
+        card.className = 'skill-card';
+
+        const typeBadge = skill.tipo === 'ativo' 
+          ? '<span class="skill-type skill-type-ativo">Ativo</span>'
+          : '<span class="skill-type skill-type-passivo">Passivo</span>';
+
+        let actionBtns = '';
+        if (canEdit) {
+          actionBtns = `
+            <div style="display:flex; gap:6px;">
+              <button class="btn-ghost" style="padding:4px 8px; font-size:0.75rem;" onclick="editSkill(${index}, 'character')">Editar</button>
+              <button class="btn-red" style="padding:4px 8px; font-size:0.75rem;" onclick="deleteSkill(${index}, 'character')">Excluir</button>
+            </div>
+          `;
+        }
+
+        card.innerHTML = `
+          <div style="flex: 1;">
+            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
+              <strong style="color: var(--gold); font-size: 1.05rem;">${escapeHtml(skill.nome)}</strong>
+              ${typeBadge}
+              <span style="font-size: 0.75rem; color: var(--text-dim);">(Nv. ${skill.nivel || 1})</span>
+            </div>
+            ${skill.dano ? `<div style="font-size: 0.85rem; color: #ff7675; margin-bottom: 4px;"><strong>Dano/Efeito:</strong> ${escapeHtml(skill.dano)}</div>` : ''}
+            <div style="font-size: 0.85rem; color: var(--text-dim); line-height: 1.4;">${escapeHtml(skill.descricao || '')}</div>
+          </div>
+          ${actionBtns}
+        `;
+
+        container.appendChild(card);
+      });
+    }
+
+    function renderMonsterSkillsList(skills, canEdit) {
+      const container = document.getElementById('monsterSkillsList');
+      if (!container) return;
+      container.innerHTML = '';
+
+      if (!skills || skills.length === 0) {
+        container.innerHTML = '<div style="color:var(--text-dim); padding:12px; text-align:center; font-size:0.85rem;">Nenhuma habilidade cadastrada para a mascote.</div>';
+        return;
+      }
+
+      skills.forEach((skill, index) => {
+        const card = document.createElement('div');
+        card.className = 'skill-card';
+
+        const typeBadge = skill.tipo === 'ativo' 
+          ? '<span class="skill-type skill-type-ativo">Ativo</span>'
+          : '<span class="skill-type skill-type-passivo">Passivo</span>';
+
+        let actionBtns = '';
+        if (canEdit) {
+          actionBtns = `
+            <div style="display:flex; gap:6px;">
+              <button class="btn-ghost" style="padding:4px 8px; font-size:0.75rem;" onclick="editSkill(${index}, 'monster')">Editar</button>
+              <button class="btn-red" style="padding:4px 8px; font-size:0.75rem;" onclick="deleteSkill(${index}, 'monster')">Excluir</button>
+            </div>
+          `;
+        }
+
+        card.innerHTML = `
+          <div style="flex: 1;">
+            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
+              <strong style="color: var(--gold);">${escapeHtml(skill.nome)}</strong>
+              ${typeBadge}
+            </div>
+            ${skill.dano ? `<div style="font-size: 0.8rem; color: #ff7675;"><strong>Efeito:</strong> ${escapeHtml(skill.dano)}</div>` : ''}
+            <div style="font-size: 0.8rem; color: var(--text-dim);">${escapeHtml(skill.descricao || '')}</div>
+          </div>
+          ${actionBtns}
+        `;
+
+        container.appendChild(card);
+      });
+    }
+
+    function openSkillModal() {
+      document.getElementById('skillModalTitle').textContent = 'Nova Habilidade do Personagem';
+      document.getElementById('skillEditIndex').value = '-1';
+      document.getElementById('skillTargetType').value = 'character';
+      document.getElementById('formSkill').reset();
+      openModal('modalSkill');
+    }
+
+    function openMonsterSkillModal() {
+      document.getElementById('skillModalTitle').textContent = 'Nova Habilidade da Mascote';
+      document.getElementById('skillEditIndex').value = '-1';
+      document.getElementById('skillTargetType').value = 'monster';
+      document.getElementById('formSkill').reset();
+      openModal('modalSkill');
+    }
+
+    function editSkill(index, targetType) {
+      const skills = targetType === 'character' 
+        ? (selectedChar.habilidades || [])
+        : (selectedChar.monster?.habilidades || []);
+      const item = skills[index];
+      if (!item) return;
+
+      document.getElementById('skillModalTitle').textContent = targetType === 'character' ? 'Editar Habilidade' : 'Editar Habilidade do Mascote';
+      document.getElementById('skillEditIndex').value = index;
+      document.getElementById('skillTargetType').value = targetType;
+
+      document.getElementById('skillInputNome').value = item.nome || '';
+      document.getElementById('skillInputTipo').value = item.tipo || 'ativo';
+      document.getElementById('skillInputNivel').value = item.nivel || 1;
+      document.getElementById('skillInputDano').value = item.dano || '';
+      document.getElementById('skillInputDesc').value = item.descricao || '';
+
+      openModal('modalSkill');
+    }
+
+    function deleteSkill(index, targetType) {
+      if (!confirm('Deseja realmente remover esta habilidade?')) return;
+
+      if (targetType === 'character') {
+        selectedChar.habilidades.splice(index, 1);
+        renderSkillsList(selectedChar.habilidades, true);
+      } else {
+        selectedChar.monster.habilidades.splice(index, 1);
+        renderMonsterSkillsList(selectedChar.monster.habilidades, true);
+      }
+      saveCharacters(charactersList);
+    }
+
+    function handleSaveSkill(event) {
+      event.preventDefault();
+      if (!selectedChar) return;
+
+      const idx = parseInt(document.getElementById('skillEditIndex').value, 10);
+      const targetType = document.getElementById('skillTargetType').value;
+
+      const skillData = {
+        nome: document.getElementById('skillInputNome').value.trim(),
+        tipo: document.getElementById('skillInputTipo').value,
+        nivel: parseInt(document.getElementById('skillInputNivel').value || 1, 10),
+        dano: document.getElementById('skillInputDano').value.trim(),
+        descricao: document.getElementById('skillInputDesc').value.trim()
+      };
+
+      if (targetType === 'character') {
+        if (!selectedChar.habilidades) selectedChar.habilidades = [];
+        if (idx >= 0) {
+          selectedChar.habilidades[idx] = skillData;
+        } else {
+          selectedChar.habilidades.push(skillData);
+        }
+        renderSkillsList(selectedChar.habilidades, true);
+      } else {
+        if (!selectedChar.monster) selectedChar.monster = {};
+        if (!selectedChar.monster.habilidades) selectedChar.monster.habilidades = [];
+        if (idx >= 0) {
+          selectedChar.monster.habilidades[idx] = skillData;
+        } else {
+          selectedChar.monster.habilidades.push(skillData);
+        }
+        renderMonsterSkillsList(selectedChar.monster.habilidades, true);
+      }
+
+      saveCharacters(charactersList);
+      closeModal('modalSkill');
+    }
+
+    /**
+     * Modal Creation for New Character (Master only)
+     */
+    function openNewCharModal() {
+      document.getElementById('formNewCharacter').reset();
+      populateUserDropdowns();
+      openModal('modalNewCharacter');
+    }
+
+    function handleNewCharAvatarFile(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        document.getElementById('newCharAvatarUrl').value = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function handleCreateNewCharacter(event) {
+      event.preventDefault();
+      const nome = document.getElementById('newCharNome').value.trim();
+      const tipo = document.getElementById('newCharTipo').value;
+      const jogador = document.getElementById('newCharJogador').value;
+      const avatarUrl = document.getElementById('newCharAvatarUrl').value.trim() || 
+        'https://images.unsplash.com/photo-1578632767115-351597cf2477?w=300';
+
+      const newChar = {
+        id: 'char_' + Date.now(),
+        nome: nome,
+        tipo: tipo,
+        jogador: jogador,
+        avatar: avatarUrl,
+        classe: tipo === 'Monstro' ? 'Criatura' : 'Guerreiro',
+        raca: tipo === 'Monstro' ? 'Monstruosidade' : 'Humano',
+        nivel: 1,
+        hpAtual: 20,
+        hpMax: 20,
+        manaAtual: 10,
+        manaMax: 10,
+        forca: 10,
+        destreza: 10,
+        constituicao: 10,
+        inteligencia: 10,
+        sabedoria: 10,
+        carisma: 10,
+        ca: 10,
+        iniciativa: '+0',
+        deslocamento: '9m',
+        notas: '',
+        habilidades: [],
+        monster: {
+          nome: 'Mascote',
+          avatar: 'https://images.unsplash.com/photo-1534447677768-be436bb09401?w=200',
+          hpAtual: 10,
+          hpMax: 10,
+          manaAtual: 5,
+          manaMax: 5,
+          forca: 8,
+          destreza: 12,
+          constituicao: 10,
+          inteligencia: 6,
+          sabedoria: 10,
+          carisma: 6,
+          habilidades: []
+        }
+      };
+
+      charactersList.push(newChar);
+      saveCharacters(charactersList);
+      closeModal('modalNewCharacter');
+      selectCharacter(newChar.id);
+    }
+
+    function populateUserDropdowns() {
+      const users = getUsers();
+      const newCharDropdown = document.getElementById('newCharJogador');
+      const detailDropdown = document.getElementById('detailSelectJogador');
+
+      let options = `<option value="">-- Mesa / Não Atribuído --</option>`;
+      users.forEach(u => {
+        options += `<option value="${escapeHtml(u.login)}">${escapeHtml(u.nome || u.login)} (${escapeHtml(u.perfil)})</option>`;
+      });
+
+      if (newCharDropdown) newCharDropdown.innerHTML = options;
+      if (detailDropdown) detailDropdown.innerHTML = options;
+    }
+
+    /**
+     * Modal Helper Functions
+     */
+    function openModal(id) {
+      const m = document.getElementById(id);
+      if (m) m.classList.add('active');
+    }
+
+    function closeModal(id) {
+      const m = document.getElementById(id);
+      if (m) m.classList.remove('active');
+    }
+
+    function escapeHtml(text) {
+      if (!text) return '';
+      return String(text)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+  </script>
+</body>
+</html>

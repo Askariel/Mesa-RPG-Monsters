@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dados do Mestre</title>
+  <link rel="stylesheet" href="../assets/style.css">
+  <style>
+    body {
+      background: #0d0d1a;
+      color: var(--text);
+      font-family: 'Cinzel', serif;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* Small Compact Header */
+    .popup-header {
+      background: linear-gradient(135deg, #1f273d, #141824);
+      border-bottom: 2px solid var(--gold);
+      padding: 8px 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .popup-title {
+      color: var(--gold);
+      font-size: 0.85rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .popup-close-btn {
+      background: none;
+      border: none;
+      color: var(--text-dim);
+      font-size: 1.1rem;
+      font-weight: bold;
+      cursor: pointer;
+      line-height: 1;
+      padding: 2px 4px;
+      transition: color 0.2s;
+    }
+
+    .popup-close-btn:hover {
+      color: var(--red-light);
+    }
+
+    .popup-body {
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    /* Roll Result Display */
+    .result-display {
+      background: #080910;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 10px;
+      text-align: center;
+      box-shadow: inset 0 0 12px rgba(0,0,0,0.8);
+      position: relative;
+    }
+
+    .result-formula {
+      font-size: 0.75rem;
+      color: var(--text-dim);
+      letter-spacing: 0.5px;
+      min-height: 18px;
+    }
+
+    .result-value {
+      font-size: 2.4rem;
+      font-weight: 900;
+      color: var(--gold);
+      text-shadow: 0 0 12px rgba(201, 162, 39, 0.6);
+      line-height: 1.1;
+      margin: 4px 0;
+      display: inline-block;
+      transition: transform 0.2s;
+    }
+
+    .result-value.animate-spin {
+      animation: spinRoll 0.45s ease-out;
+    }
+
+    @keyframes spinRoll {
+      0% {
+        transform: rotate(0deg) scale(0.6);
+        opacity: 0.4;
+      }
+      50% {
+        transform: rotate(360deg) scale(1.25);
+        opacity: 1;
+      }
+      100% {
+        transform: rotate(720deg) scale(1);
+        opacity: 1;
+      }
+    }
+
+    /* Dice Circular Buttons Grid */
+    .dice-circle-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+    }
+
+    .die-circle-btn {
+      aspect-ratio: 1;
+      border-radius: 50%;
+      background: radial-gradient(circle at 35% 35%, #2a3556, #16213e);
+      border: 2px solid var(--border);
+      color: var(--text);
+      font-family: inherit;
+      font-weight: 700;
+      font-size: 0.9rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.5);
+    }
+
+    .die-circle-btn:hover {
+      border-color: var(--gold);
+      color: var(--gold);
+      transform: scale(1.08) translateY(-2px);
+      box-shadow: 0 6px 14px rgba(201, 162, 39, 0.4);
+    }
+
+    .die-circle-btn:active {
+      transform: scale(0.95);
+    }
+
+    /* Custom Dice & Bonus Modifier */
+    .controls-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      background: rgba(22, 33, 62, 0.5);
+      padding: 8px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+    }
+
+    .control-item {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .control-item label {
+      font-size: 0.7rem;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      font-weight: 600;
+    }
+
+    .control-item input[type="number"] {
+      background: var(--bg-dark);
+      border: 1px solid var(--border);
+      color: var(--gold);
+      padding: 6px;
+      border-radius: 4px;
+      font-family: inherit;
+      font-weight: 700;
+      text-align: center;
+      font-size: 0.9rem;
+    }
+
+    .custom-die-row {
+      display: flex;
+      gap: 6px;
+    }
+
+    .custom-die-row input {
+      flex: 1;
+    }
+
+    .custom-die-row button {
+      padding: 0 10px;
+      font-size: 0.75rem;
+    }
+
+    /* Roll History */
+    .history-section {
+      border-top: 1px solid var(--border);
+      padding-top: 8px;
+    }
+
+    .history-title {
+      font-size: 0.7rem;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 6px;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .history-tags-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      max-height: 80px;
+      overflow-y: auto;
+    }
+
+    .history-tag {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 3px 6px;
+      font-size: 0.75rem;
+      color: var(--text);
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .history-tag strong {
+      color: var(--gold);
+    }
+
+    /* Floating Window trigger */
+    .btn-popout {
+      width: 100%;
+      background: var(--bg-mid);
+      border: 1px dashed var(--gold);
+      color: var(--gold);
+      padding: 8px;
+      font-family: inherit;
+      font-size: 0.75rem;
+      border-radius: 4px;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.2s;
+    }
+
+    .btn-popout:hover {
+      background: rgba(201, 162, 39, 0.15);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <div class="popup-header">
+    <div class="popup-title">
+      <span>&#127922;</span> DADOS DO MESTRE
+    </div>
+    <button class="popup-close-btn" onclick="handleClose()" title="Fechar Janela">&times;</button>
+  </div>
+
+  <div class="popup-body">
+
+    <!-- Big Result Box -->
+    <div class="result-display">
+      <div class="result-formula" id="resultFormula">Selecione um dado para rolar</div>
+      <div class="result-value" id="resultValue">-</div>
+    </div>
+
+    <!-- Dice Buttons (d2, d4, d6, d8, d10, d12, d20, d100) -->
+    <div class="dice-circle-grid">
+      <button class="die-circle-btn" onclick="rollDie(2)">d2</button>
+      <button class="die-circle-btn" onclick="rollDie(4)">d4</button>
+      <button class="die-circle-btn" onclick="rollDie(6)">d6</button>
+      <button class="die-circle-btn" onclick="rollDie(8)">d8</button>
+      <button class="die-circle-btn" onclick="rollDie(10)">d10</button>
+      <button class="die-circle-btn" onclick="rollDie(12)">d12</button>
+      <button class="die-circle-btn" onclick="rollDie(20)">d20</button>
+      <button class="die-circle-btn" onclick="rollDie(100)">d100</button>
+    </div>
+
+    <!-- Custom Sides & Modifier -->
+    <div class="controls-row">
+      <div class="control-item">
+        <label for="bonusModifier">Bônus Modificador</label>
+        <input type="number" id="bonusModifier" value="0" />
+      </div>
+
+      <div class="control-item">
+        <label for="customDieSides">Dado Personalizado</label>
+        <div class="custom-die-row">
+          <input type="number" id="customDieSides" placeholder="Lados" min="2" max="1000" value="30" />
+          <button class="btn-gold" onclick="rollCustomDie()">Rolar</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Roll History -->
+    <div class="history-section">
+      <div class="history-title">
+        <span>Últimas 10 Rolagens</span>
+        <span id="historyCounter">0 rolagens</span>
+      </div>
+      <div class="history-tags-container" id="historyContainer">
+        <!-- Rendered tags -->
+      </div>
+    </div>
+
+    <!-- Popout Button -->
+    <button class="btn-popout" onclick="openFloatingWindow()">
+      &#128065; Abrir em Janela Flutuante
+    </button>
+
+  </div>
+
+  <script src="../assets/auth.js"></script>
+  <script>
+    // 1. Auth Guard
+    const currentUser = requireMestre();
+
+    const DICE_HISTORY_KEY = 'rpg_mesa_dice_history';
+
+    // 2. Rolling mechanism
+    function rollDie(sides) {
+      const modifierInput = document.getElementById('bonusModifier');
+      const bonus = parseInt(modifierInput.value, 10) || 0;
+
+      const formulaEl = document.getElementById('resultFormula');
+      const valueEl = document.getElementById('resultValue');
+
+      // Trigger spin effect
+      valueEl.classList.remove('animate-spin');
+      void valueEl.offsetWidth; // trigger reflow
+      valueEl.classList.add('animate-spin');
+
+      const rawResult = Math.floor(Math.random() * sides) + 1;
+      const total = rawResult + bonus;
+
+      setTimeout(() => {
+        let formulaText = `d${sides} &rarr; ${rawResult}`;
+        if (bonus !== 0) {
+          formulaText += ` ${bonus >= 0 ? '+' : ''}${bonus} = ${total}`;
+        }
+        formulaEl.innerHTML = formulaText;
+        valueEl.textContent = total;
+
+        // Save to diceHistory
+        saveRollRecord(`d${sides}`, bonus, rawResult, total);
+        renderHistory();
+      }, 250);
+    }
+
+    function rollCustomDie() {
+      const sidesInput = document.getElementById('customDieSides');
+      const sides = parseInt(sidesInput.value, 10);
+      if (!sides || sides < 2) {
+        alert('Informe um número válido de lados (mínimo 2).');
+        return;
+      }
+      rollDie(sides);
+    }
+
+    // 3. Save roll record to LocalStorage
+    function saveRollRecord(dieType, bonus, result, total) {
+      let history = [];
+      try {
+        history = JSON.parse(localStorage.getItem(DICE_HISTORY_KEY)) || [];
+      } catch (e) {
+        history = [];
+      }
+
+      // Check current active session id if any
+      let currentSessionId = 'sess_1';
+      try {
+        const sessions = JSON.parse(localStorage.getItem('rpg_mesa_sessions')) || [];
+        const active = sessions.find(s => s.status === 'active');
+        if (active) currentSessionId = active.id;
+      } catch (e) {}
+
+      const record = {
+        id: 'roll_' + Date.now(),
+        user: (currentUser ? (currentUser.nome || currentUser.login) : 'Mestre'),
+        dieType: dieType,
+        bonus: bonus,
+        result: result,
+        total: total,
+        timestamp: new Date().toISOString(),
+        sessionId: currentSessionId
+      };
+
+      history.unshift(record);
+      // Keep only last 50 overall
+      if (history.length > 50) history.pop();
+
+      localStorage.setItem(DICE_HISTORY_KEY, JSON.stringify(history));
+    }
+
+    // 4. Render History (last 10 rolls)
+    function renderHistory() {
+      const container = document.getElementById('historyContainer');
+      const countEl = document.getElementById('historyCounter');
+
+      let history = [];
+      try {
+        history = JSON.parse(localStorage.getItem(DICE_HISTORY_KEY)) || [];
+      } catch (e) {
+        history = [];
+      }
+
+      const last10 = history.slice(0, 10);
+      countEl.textContent = `${last10.length} registradas`;
+
+      container.innerHTML = '';
+      if (last10.length === 0) {
+        container.innerHTML = '<span style="color:var(--text-dim); font-size:0.75rem;">Nenhuma rolagem feita ainda.</span>';
+        return;
+      }
+
+      last10.forEach(item => {
+        const tag = document.createElement('div');
+        tag.className = 'history-tag';
+        tag.innerHTML = `<span>${item.dieType}${item.bonus ? (item.bonus > 0 ? '+' + item.bonus : item.bonus) : ''}:</span> <strong>${item.total}</strong>`;
+        container.appendChild(tag);
+      });
+    }
+
+    // 5. Open in separate floating window
+    function openFloatingWindow() {
+      window.open(
+        'dados-mestre.html',
+        'dados_mestre_window',
+        'width=350,height=500,resizable=yes,scrollbars=no,status=no,toolbar=no,menubar=no,location=no'
+      );
+    }
+
+    function handleClose() {
+      if (window.opener) {
+        window.close();
+      } else {
+        window.location.href = '../dashboard.html';
+      }
+    }
+
+    // Initialize
+    document.addEventListener('DOMContentLoaded', () => {
+      renderHistory();
+    });
+  </script>
+</body>
+</html>

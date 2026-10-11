@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MESA RPG - Dashboard</title>
+  <link rel="stylesheet" href="assets/style.css">
+  <style>
+    .dashboard-header {
+      margin-bottom: 30px;
+      padding: 24px;
+      background: linear-gradient(135deg, rgba(26,26,46,0.9), rgba(13,13,26,0.9));
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+    .welcome-text h1 {
+      font-size: 1.8rem;
+      margin-bottom: 4px;
+    }
+    .welcome-text p {
+      color: var(--text-dim);
+      font-size: 0.95rem;
+    }
+    .option-card {
+      background: var(--bg-card);
+      border-radius: 12px;
+      padding: 36px 24px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      min-height: 320px;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      position: relative;
+    }
+    .option-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 12px 25px rgba(0, 0, 0, 0.7);
+    }
+    .option-card-sessao {
+      border: 2px solid var(--red-light);
+    }
+    .option-card-sessao:hover {
+      box-shadow: 0 12px 25px rgba(192, 57, 43, 0.3);
+    }
+    .option-card-personagens {
+      border: 2px solid var(--gold);
+    }
+    .option-card-personagens:hover {
+      box-shadow: 0 12px 25px rgba(201, 162, 39, 0.3);
+    }
+    .option-card-config {
+      border: 2px solid var(--red-light);
+    }
+    .card-icon {
+      font-size: 3.5rem;
+      margin-bottom: 16px;
+      line-height: 1;
+    }
+    .card-title {
+      font-size: 1.35rem;
+      margin-bottom: 10px;
+      letter-spacing: 1px;
+    }
+    .card-desc {
+      color: var(--text-dim);
+      font-size: 0.9rem;
+      line-height: 1.5;
+      margin-bottom: 24px;
+      flex-grow: 1;
+    }
+    .card-action {
+      width: 100%;
+    }
+    .footer {
+      margin-top: 50px;
+      padding-top: 20px;
+      border-top: 1px solid var(--border);
+      text-align: center;
+      color: var(--text-dim);
+      font-size: 0.85rem;
+    }
+  </style>
+</head>
+<body>
+  <!-- Navbar -->
+  <nav class="navbar">
+    <div class="navbar-brand">
+      <a href="dashboard.html" class="logo">
+        <span style="font-size: 1.6rem;">⚔️</span> MESA RPG
+      </a>
+    </div>
+    <div class="navbar-menu">
+      <div id="userInfo" style="display: flex; align-items: center; gap: 10px;">
+        <span id="userName" style="color: var(--text); font-weight: 600;">--</span>
+        <span id="userBadge" class="badge">--</span>
+      </div>
+      <button onclick="logout()" class="btn-ghost" style="padding: 6px 14px; font-size: 0.85rem;">
+        🚪 SAIR
+      </button>
+    </div>
+  </nav>
+
+  <div class="page-wrapper">
+    <!-- Header Banner -->
+    <header class="dashboard-header">
+      <div class="welcome-text">
+        <h1 id="greetingTitle">Bem-vindo, Aventureiro</h1>
+        <p>Painel de Comando e Gestão da Mesa Virtual de RPG</p>
+      </div>
+      <div>
+        <span id="roleNotice" class="badge" style="font-size: 0.9rem; padding: 6px 16px;"></span>
+      </div>
+    </header>
+
+    <!-- Main Options Grid -->
+    <main class="grid-3">
+      <!-- 1. INICIAR SESSÃO -->
+      <div class="option-card option-card-sessao">
+        <div class="card-icon">🎲</div>
+        <h2 class="card-title">INICIAR SESSÃO</h2>
+        <p class="card-desc">
+          Acesse a mesa de jogo ao vivo, role dados mágicos, visualize o mapa tático e acompanhe o combate em tempo real.
+        </p>
+        <div class="card-action">
+          <a id="btnIniciarSessao" href="#" class="btn-red" style="width: 100%;">
+            ENTRAR NA MESA
+          </a>
+        </div>
+      </div>
+
+      <!-- 2. PERSONAGENS -->
+      <div class="option-card option-card-personagens">
+        <div class="card-icon">🛡️</div>
+        <h2 class="card-title">PERSONAGENS</h2>
+        <p class="card-desc">
+          Visualize, crie e edite fichas completas de personagens, atributos, pontos de vida, magias e inventário.
+        </p>
+        <div class="card-action">
+          <a href="personagens/index.html" class="btn-gold" style="width: 100%;">
+            VER FICHAS
+          </a>
+        </div>
+      </div>
+
+      <!-- 3. CONFIGURAÇÕES -->
+      <div id="cardConfig" class="option-card option-card-config">
+        <div class="card-icon">⚙️</div>
+        <h2 class="card-title">CONFIGURAÇÕES</h2>
+        <p class="card-desc">
+          Gerenciamento de mestres e jogadores, personalização de regras e manutenção de arquivos da campanha.
+        </p>
+        <div class="card-action">
+          <a id="btnConfig" href="configuracoes/index.html" class="btn-ghost" style="width: 100%;">
+            PAINEL DO MESTRE
+          </a>
+        </div>
+      </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <p>Mesa RPG Digital v1.0 • Desenvolvido para Mestres & Jogadores • Todos os direitos reservados</p>
+    </footer>
+  </div>
+
+  <script src="assets/auth.js"></script>
+  <script>
+    // Validate authentication
+    const user = requireAuth();
+    if (user) {
+      // Set user header details
+      document.getElementById('userName').textContent = user.nome || user.login;
+      const userBadge = document.getElementById('userBadge');
+      const roleNotice = document.getElementById('roleNotice');
+
+      if (user.perfil === 'mestre') {
+        userBadge.className = 'badge badge-mestre';
+        userBadge.textContent = 'MESTRE';
+        roleNotice.className = 'badge badge-mestre';
+        roleNotice.textContent = '👑 Acesso de Mestre Autorizado';
+        document.getElementById('greetingTitle').textContent = `Bem-vindo, Mestre ${user.nome || user.login}`;
+        
+        // Mestre link to controle-mesa.html
+        document.getElementById('btnIniciarSessao').href = 'sessao/controle-mesa.html';
+      } else {
+        userBadge.className = 'badge badge-jogador';
+        userBadge.textContent = 'JOGADOR';
+        roleNotice.className = 'badge badge-jogador';
+        roleNotice.textContent = '⚔️ Aventureiro Conectado';
+        document.getElementById('greetingTitle').textContent = `Bem-vindo, ${user.nome || user.login}`;
+
+        // Jogador link to hub.html
+        document.getElementById('btnIniciarSessao').href = 'sessao/hub.html';
+
+        // Apply lock overlay on Configurações card
+        const cardConfig = document.getElementById('cardConfig');
+        cardConfig.classList.add('lock-overlay');
+        const btnConfig = document.getElementById('btnConfig');
+        btnConfig.style.pointerEvents = 'none';
+        btnConfig.textContent = 'ACESSO RESTRITO';
+      }
+    }
+  </script>
+</body>
+</html>

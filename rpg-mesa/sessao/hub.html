@@ -1,0 +1,1162 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HUB - MESA DE JOGO | RPG de Mesa</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=MedievalSharp&family=Cinzel+Decorative:wght@700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/style.css">
+  <style>
+    :root {
+      --bg-dark: #0d0d1a;
+      --bg-mid: #1a1a2e;
+      --bg-card: #16213e;
+      --gold: #c9a227;
+      --gold-bright: #ffd700;
+      --red: #8b0000;
+      --red-bright: #c0392b;
+      --blue: #1b4d89;
+      --green: #27ae60;
+      --text: #e8d5b7;
+      --text-dim: #a89070;
+      --border: #2a2a4a;
+      --border-gold: #c9a22744;
+      --font-rpg: 'Cinzel', serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      color: var(--text);
+      font-family: var(--font-rpg);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+      background-image: 
+        radial-gradient(circle at 50% 20%, rgba(26, 26, 46, 0.8) 0%, rgba(13, 13, 26, 0.98) 80%),
+        repeating-linear-gradient(0deg, rgba(201, 162, 39, 0.015) 0px, rgba(201, 162, 39, 0.015) 1px, transparent 1px, transparent 30px);
+    }
+
+    /* TOP NAVBAR */
+    .rpg-navbar {
+      background: linear-gradient(180deg, #18182c 0%, #101020 100%);
+      border-bottom: 2px solid var(--gold);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.7), 0 0 15px rgba(201, 162, 39, 0.15);
+      padding: 10px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      z-index: 100;
+    }
+
+    .nav-left {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .btn-nav-back {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px;
+      background: rgba(22, 33, 62, 0.8);
+      color: var(--gold);
+      border: 1px solid var(--gold);
+      border-radius: 4px;
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 600;
+      letter-spacing: 1px;
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+
+    .btn-nav-back:hover {
+      background: var(--gold);
+      color: #0d0d1a;
+      box-shadow: 0 0 12px rgba(201, 162, 39, 0.5);
+    }
+
+    .nav-title {
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: var(--gold);
+      letter-spacing: 2px;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8), 0 0 10px rgba(201, 162, 39, 0.4);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .nav-title span.badge {
+      font-size: 0.7rem;
+      background: var(--red);
+      color: #fff;
+      padding: 2px 8px;
+      border-radius: 3px;
+      border: 1px solid #ff4d4d;
+      letter-spacing: 1px;
+    }
+
+    .nav-user {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 0.9rem;
+      color: var(--text-dim);
+    }
+
+    .user-pill {
+      background: #16213e;
+      border: 1px solid var(--border);
+      padding: 4px 12px;
+      border-radius: 20px;
+      color: var(--gold);
+      font-weight: 600;
+    }
+
+    /* 3-PANEL LAYOUT */
+    .hub-container {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 240px 1fr 240px;
+      gap: 14px;
+      padding: 14px;
+      max-width: 100vw;
+      box-sizing: border-box;
+      min-height: calc(100vh - 120px);
+    }
+
+    @media (max-width: 1100px) {
+      .hub-container {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* PANEL STYLES */
+    .panel-box {
+      background: rgba(22, 33, 62, 0.75);
+      border: 1px solid var(--border);
+      border-top: 2px solid var(--gold);
+      border-radius: 6px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(8px);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .panel-header {
+      background: linear-gradient(180deg, rgba(201, 162, 39, 0.15) 0%, rgba(22, 33, 62, 0.9) 100%);
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--border-gold);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .panel-header h2 {
+      font-size: 1.05rem;
+      color: var(--gold);
+      letter-spacing: 1.5px;
+      margin: 0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .panel-body {
+      padding: 12px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      overflow-y: auto;
+    }
+
+    /* MASTER PANEL */
+    .master-feed-card {
+      background: #090912;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    .master-video-wrapper {
+      position: relative;
+      width: 100%;
+      height: 180px;
+      background: #050508;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    .master-video-wrapper video,
+    .master-video-wrapper img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .master-status-tag {
+      position: absolute;
+      top: 8px;
+      left: 8px;
+      background: rgba(139, 0, 0, 0.85);
+      border: 1px solid #ff4444;
+      font-size: 0.65rem;
+      padding: 2px 6px;
+      border-radius: 3px;
+      color: #fff;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    .master-feed-info {
+      padding: 10px;
+      text-align: center;
+      background: rgba(13, 13, 26, 0.8);
+      border-top: 1px solid var(--border);
+    }
+
+    .master-name {
+      color: var(--gold);
+      font-weight: 700;
+      font-size: 0.95rem;
+    }
+
+    .master-role {
+      font-size: 0.75rem;
+      color: var(--text-dim);
+    }
+
+    .btn-action-panel {
+      width: 100%;
+      background: linear-gradient(135deg, rgba(201, 162, 39, 0.2) 0%, rgba(27, 77, 137, 0.3) 100%);
+      color: var(--gold);
+      border: 1px solid var(--gold);
+      padding: 10px;
+      border-radius: 4px;
+      font-family: var(--font-rpg);
+      font-weight: 600;
+      font-size: 0.85rem;
+      letter-spacing: 1px;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    .btn-action-panel:hover {
+      background: var(--gold);
+      color: #0d0d1a;
+      box-shadow: 0 0 14px rgba(201, 162, 39, 0.4);
+    }
+
+    /* CENTER MESA PANEL */
+    .mesa-center-panel {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .mesa-display-area {
+      flex: 1;
+      min-height: 400px;
+      background: #06060c;
+      border: 2px solid #2f2f4f;
+      border-radius: 8px;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.95), 0 0 20px rgba(0, 0, 0, 0.7);
+    }
+
+    .mesa-zoom-controls {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      display: flex;
+      gap: 6px;
+      background: rgba(13, 13, 26, 0.85);
+      border: 1px solid var(--gold);
+      border-radius: 20px;
+      padding: 4px 8px;
+      z-index: 20;
+      backdrop-filter: blur(4px);
+    }
+
+    .btn-zoom {
+      background: transparent;
+      border: none;
+      color: var(--gold);
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s;
+    }
+
+    .btn-zoom:hover {
+      background: rgba(201, 162, 39, 0.25);
+    }
+
+    .zoom-level-label {
+      font-size: 0.75rem;
+      color: var(--text-dim);
+      display: flex;
+      align-items: center;
+      padding: 0 4px;
+      min-width: 42px;
+      justify-content: center;
+    }
+
+    .mesa-content-wrapper {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.2s cubic-bezier(0.25, 1, 0.5, 1);
+      transform-origin: center center;
+    }
+
+    .mesa-content-wrapper img,
+    .mesa-content-wrapper video {
+      max-width: 95%;
+      max-height: 95%;
+      object-fit: contain;
+      box-shadow: 0 0 30px rgba(0, 0, 0, 0.9);
+      border: 1px solid var(--border-gold);
+      border-radius: 4px;
+    }
+
+    .mesa-placeholder {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+      color: var(--text-dim);
+      text-align: center;
+      padding: 20px;
+    }
+
+    .mesa-placeholder .icon {
+      font-size: 2.8rem;
+      color: var(--gold);
+      opacity: 0.6;
+      animation: pulse-glow 3s infinite ease-in-out;
+    }
+
+    @keyframes pulse-glow {
+      0%, 100% { opacity: 0.4; transform: scale(1); }
+      50% { opacity: 0.8; transform: scale(1.05); }
+    }
+
+    /* DICE SECTION */
+    .dice-section {
+      background: rgba(22, 33, 62, 0.9);
+      border: 1px solid var(--border);
+      border-top: 2px solid var(--gold);
+      border-radius: 6px;
+      padding: 12px 16px;
+    }
+
+    .dice-section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+
+    .dice-section-title {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--gold);
+      letter-spacing: 1.5px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .dice-controls {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .dice-buttons-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .btn-dice {
+      background: linear-gradient(180deg, #1f2747 0%, #11162b 100%);
+      color: var(--text);
+      border: 1px solid var(--border);
+      padding: 6px 12px;
+      border-radius: 4px;
+      font-family: var(--font-rpg);
+      font-weight: 700;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      min-width: 44px;
+      text-align: center;
+    }
+
+    .btn-dice:hover {
+      border-color: var(--gold);
+      color: var(--gold);
+      box-shadow: 0 0 10px rgba(201, 162, 39, 0.3);
+    }
+
+    .btn-dice.selected {
+      background: var(--gold);
+      color: #0d0d1a;
+      border-color: #ffd700;
+      box-shadow: 0 0 12px rgba(201, 162, 39, 0.6);
+    }
+
+    .bonus-group {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: #0e1424;
+      border: 1px solid var(--border);
+      padding: 4px 8px;
+      border-radius: 4px;
+    }
+
+    .bonus-group label {
+      font-size: 0.8rem;
+      color: var(--text-dim);
+    }
+
+    .bonus-input {
+      width: 50px;
+      background: #1a223a;
+      border: 1px solid var(--border-gold);
+      color: var(--gold);
+      font-family: var(--font-rpg);
+      font-size: 0.9rem;
+      font-weight: 700;
+      text-align: center;
+      padding: 3px;
+      border-radius: 3px;
+    }
+
+    .btn-roll {
+      background: linear-gradient(135deg, #c9a227 0%, #8b0000 100%);
+      color: #fff;
+      border: 1px solid #ffd700;
+      font-family: var(--font-rpg);
+      font-size: 0.95rem;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      padding: 7px 18px;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      box-shadow: 0 2px 10px rgba(139, 0, 0, 0.4);
+    }
+
+    .btn-roll:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 15px rgba(201, 162, 39, 0.6);
+      filter: brightness(1.15);
+    }
+
+    .dice-results-display {
+      margin-top: 10px;
+      padding: 8px 12px;
+      background: #090e1c;
+      border: 1px dashed var(--border-gold);
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      min-height: 38px;
+      font-size: 0.85rem;
+    }
+
+    .dice-result-active {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 0.95rem;
+    }
+
+    .dice-result-val {
+      font-size: 1.3rem;
+      font-weight: 900;
+      color: var(--gold);
+      text-shadow: 0 0 10px rgba(201, 162, 39, 0.6);
+    }
+
+    /* PLAYERS PANEL */
+    .players-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .player-slot-card {
+      background: #0d1222;
+      border: 1px solid var(--border);
+      border-radius: 5px;
+      padding: 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .player-slot-card.is-current-user {
+      border-color: var(--gold);
+      background: rgba(22, 33, 62, 0.9);
+      box-shadow: 0 0 8px rgba(201, 162, 39, 0.2);
+    }
+
+    .player-slot-video {
+      position: relative;
+      width: 100%;
+      height: 110px;
+      background: #05070f;
+      border-radius: 4px;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid #1c253d;
+    }
+
+    .player-slot-video video,
+    .player-slot-video img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .slot-placeholder-icon {
+      font-size: 1.8rem;
+      color: #3b4260;
+    }
+
+    .player-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.8rem;
+    }
+
+    .player-slot-name {
+      font-weight: 700;
+      color: var(--text);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .player-slot-char {
+      font-size: 0.7rem;
+      color: var(--gold);
+    }
+
+    .slot-actions {
+      display: flex;
+      gap: 4px;
+    }
+
+    .btn-slot-action {
+      flex: 1;
+      padding: 4px 6px;
+      font-size: 0.68rem;
+      background: #18223a;
+      border: 1px solid var(--border);
+      color: var(--text-dim);
+      border-radius: 3px;
+      cursor: pointer;
+      font-family: var(--font-rpg);
+      text-align: center;
+      transition: all 0.2s;
+    }
+
+    .btn-slot-action:hover {
+      border-color: var(--gold);
+      color: var(--gold);
+    }
+
+    .btn-slot-action.active {
+      background: var(--red);
+      color: #fff;
+      border-color: #ff4d4d;
+    }
+
+    /* QUICK NAVIGATION BAR */
+    .quick-nav-bar {
+      background: #101322;
+      border-top: 1px solid var(--border-gold);
+      padding: 10px 16px;
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .quick-nav-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(22, 33, 62, 0.9);
+      color: var(--text);
+      border: 1px solid var(--border);
+      padding: 8px 18px;
+      border-radius: 4px;
+      text-decoration: none;
+      font-size: 0.85rem;
+      font-weight: 600;
+      letter-spacing: 1px;
+      transition: all 0.2s ease;
+    }
+
+    .quick-nav-btn:hover {
+      border-color: var(--gold);
+      color: var(--gold);
+      background: rgba(201, 162, 39, 0.1);
+      box-shadow: 0 0 10px rgba(201, 162, 39, 0.25);
+    }
+
+    .quick-nav-btn.active {
+      background: var(--gold);
+      color: #0d0d1a;
+      border-color: #ffd700;
+    }
+
+    /* MODAL */
+    .rpg-modal-backdrop {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.85);
+      z-index: 999;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .rpg-modal {
+      background: var(--bg-mid);
+      border: 2px solid var(--gold);
+      border-radius: 6px;
+      width: 90%;
+      max-width: 600px;
+      padding: 20px;
+      box-shadow: 0 0 30px rgba(201, 162, 39, 0.3);
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--border-gold);
+      padding-bottom: 10px;
+      margin-bottom: 14px;
+    }
+
+    .modal-close {
+      background: transparent;
+      border: none;
+      color: var(--gold);
+      font-size: 1.5rem;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- TOP NAVBAR -->
+  <header class="rpg-navbar">
+    <div class="nav-left">
+      <a href="../dashboard.html" class="btn-nav-back" title="Voltar ao Painel">
+        <span>&larr;</span> Painel
+      </a>
+      <div class="nav-title">
+        <span>⚔️</span> HUB - MESA DE JOGO
+        <span class="badge">AO VIVO</span>
+      </div>
+    </div>
+    <div class="nav-user">
+      <span>Conectado como:</span>
+      <span class="user-pill" id="navCurrentUser">Jogador</span>
+    </div>
+  </header>
+
+  <!-- MAIN 3-PANEL HUB -->
+  <main class="hub-container">
+
+    <!-- LEFT PANEL: MASTER AREA -->
+    <aside class="panel-box">
+      <div class="panel-header">
+        <h2><span>👑</span> MESTRE</h2>
+      </div>
+      <div class="panel-body">
+        <div class="master-feed-card">
+          <div class="master-video-wrapper" id="masterVideoWrapper">
+            <span class="master-status-tag">MESTRE ONLINE</span>
+            <img id="masterAvatarImg" src="https://images.unsplash.com/photo-1578632767115-351597cf2477?w=400&auto=format&fit=crop&q=80" alt="Avatar do Mestre">
+          </div>
+          <div class="master-feed-info">
+            <div class="master-name" id="masterNameDisplay">Mestre da Masmorra</div>
+            <div class="master-role">Narrador & Regente</div>
+          </div>
+        </div>
+
+        <button class="btn-action-panel" id="btnToggleMasterCam" onclick="toggleMasterFeedModal()">
+          <span>👁️</span> Ver Câmera Mestre
+        </button>
+
+        <div style="background: rgba(13,13,26,0.5); padding: 10px; border-radius: 4px; border: 1px solid var(--border); font-size: 0.75rem; color: var(--text-dim); line-height: 1.4;">
+          <strong style="color:var(--gold); display:block; margin-bottom:4px;">📜 Status da Mesa:</strong>
+          Sessão ativa e sincronizada. Os conteúdos exibidos no centro são controlados diretamente pelo Mestre.
+        </div>
+      </div>
+    </aside>
+
+    <!-- CENTER PANEL: MESA (DISPLAY + DICE) -->
+    <section class="mesa-center-panel">
+      <!-- MESA DISPLAY AREA -->
+      <div class="mesa-display-area" id="mesaDisplayArea">
+        <!-- ZOOM CONTROLS -->
+        <div class="mesa-zoom-controls">
+          <button class="btn-zoom" title="Zoom In" onclick="changeZoom(0.15)">+</button>
+          <button class="btn-zoom" title="Zoom Out" onclick="changeZoom(-0.15)">&minus;</button>
+          <button class="btn-zoom" title="Resetar Zoom" onclick="resetZoom()">⟲</button>
+          <span class="zoom-level-label" id="zoomLevelLabel">100%</span>
+        </div>
+
+        <!-- MESA CONTENT CONTAINER -->
+        <div class="mesa-content-wrapper" id="mesaContentWrapper">
+          <div class="mesa-placeholder" id="mesaPlaceholder">
+            <div class="icon">📜</div>
+            <p style="font-size: 1.1rem; color: var(--text);">Aguardando conteúdo do Mestre...</p>
+            <p style="font-size: 0.8rem; color: var(--text-dim);">Imagens, mapas e vídeos transmitidos pelo regente aparecerão nesta tela.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- DICE SECTION -->
+      <div class="dice-section">
+        <div class="dice-section-header">
+          <div class="dice-section-title">
+            <span>🎲</span> DADOS DOS JOGADORES
+          </div>
+          <div style="font-size: 0.75rem; color: var(--text-dim);" id="diceLastRollTime">
+            Nenhuma rolagem recente
+          </div>
+        </div>
+
+        <div class="dice-controls">
+          <!-- DICE BUTTONS -->
+          <div class="dice-buttons-group">
+            <button class="btn-dice" onclick="selectDice(4, this)">d4</button>
+            <button class="btn-dice" onclick="selectDice(6, this)">d6</button>
+            <button class="btn-dice" onclick="selectDice(8, this)">d8</button>
+            <button class="btn-dice" onclick="selectDice(10, this)">d10</button>
+            <button class="btn-dice" onclick="selectDice(12, this)">d12</button>
+            <button class="btn-dice selected" onclick="selectDice(20, this)">d20</button>
+            <button class="btn-dice" onclick="selectDice(100, this)">d100</button>
+          </div>
+
+          <!-- BONUS INPUT -->
+          <div class="bonus-group">
+            <label for="diceBonusInput">Bônus:</label>
+            <input type="number" id="diceBonusInput" class="bonus-input" value="0">
+          </div>
+
+          <!-- ROLL BUTTON -->
+          <button class="btn-roll" onclick="handleRollClick()">
+            ROLAR
+          </button>
+        </div>
+
+        <!-- RESULTS DISPLAY -->
+        <div class="dice-results-display" id="diceResultsDisplay">
+          <div class="dice-result-active" id="activeResultContent">
+            <span>Selecione um dado e clique em ROLAR.</span>
+          </div>
+          <div style="font-size: 0.75rem; color: var(--text-dim);" id="activeRollDetails"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- RIGHT PANEL: PLAYERS AREA -->
+    <aside class="panel-box">
+      <div class="panel-header">
+        <h2><span>👥</span> JOGADORES</h2>
+      </div>
+      <div class="panel-body">
+        <div class="players-list" id="playersSlotsContainer">
+          <!-- Slots 1 through 4 will be rendered via JS -->
+        </div>
+      </div>
+    </aside>
+
+  </main>
+
+  <!-- QUICK NAV BAR -->
+  <nav class="quick-nav-bar">
+    <a href="hub.html" class="quick-nav-btn active">
+      <span>🏰</span> HUB Central
+    </a>
+    <a href="conteudos.html" class="quick-nav-btn">
+      <span>🖼️</span> Conteúdos da Sessão
+    </a>
+    <a href="registro-sessao.html" class="quick-nav-btn">
+      <span>📜</span> Registro de Sessão
+    </a>
+    <a href="personagens-sessao.html" class="quick-nav-btn">
+      <span>⚔️</span> Personagens na Sessão
+    </a>
+  </nav>
+
+  <!-- MODAL MASTER CAM ENLARGED -->
+  <div class="rpg-modal-backdrop" id="masterCamModal" onclick="closeMasterModal(event)">
+    <div class="rpg-modal" onclick="event.stopPropagation()">
+      <div class="modal-header">
+        <h3 style="color:var(--gold);">Câmera do Mestre</h3>
+        <button class="modal-close" onclick="toggleMasterFeedModal()">&times;</button>
+      </div>
+      <div style="width:100%; height:320px; background:#000; border-radius:4px; overflow:hidden; display:flex; align-items:center; justify-content:center;">
+        <img src="https://images.unsplash.com/photo-1578632767115-351597cf2477?w=800&auto=format&fit=crop&q=80" style="width:100%; height:100%; object-fit:cover;" alt="Mestre">
+      </div>
+    </div>
+  </div>
+
+  <!-- AUTH JS SCRIPT -->
+  <script src="../assets/auth.js"></script>
+
+  <script>
+    // --- AUTH & INITIALIZATION ---
+    // requireAuth() is defined in ../assets/auth.js — it redirects if not logged in
+    const currentUser = (typeof requireAuth === 'function') ? requireAuth() : null;
+    if (!currentUser) {
+      // Fallback: if auth.js not yet loaded, check sessionStorage directly
+      const raw = sessionStorage.getItem('currentUser');
+      if (!raw) { window.location.href = '../index.html'; }
+    }
+    const _user = currentUser || JSON.parse(sessionStorage.getItem('currentUser') || '{"nome":"Jogador","login":"jogador"}');
+    document.getElementById('navCurrentUser').textContent = _user.nome || _user.login || 'Jogador';
+
+    // --- ZOOM LOGIC ---
+    let currentZoom = 1.0;
+    function changeZoom(delta) {
+      currentZoom = Math.min(Math.max(0.4, currentZoom + delta), 3.0);
+      applyZoom();
+    }
+
+    function resetZoom() {
+      currentZoom = 1.0;
+      applyZoom();
+    }
+
+    function applyZoom() {
+      const wrapper = document.getElementById('mesaContentWrapper');
+      wrapper.style.transform = `scale(${currentZoom})`;
+      document.getElementById('zoomLevelLabel').textContent = `${Math.round(currentZoom * 100)}%`;
+    }
+
+    // --- MESA CONTENT POLLING ---
+    // Uses getMesaContent() from auth.js (key: rpg_mesa_content)
+    let lastMesaHash = null;
+
+    function renderMesaDisplay(items) {
+      const wrapper = document.getElementById('mesaContentWrapper');
+      if (!items || items.length === 0) {
+        wrapper.innerHTML = `
+          <div class="mesa-placeholder" id="mesaPlaceholder">
+            <div class="icon">📜</div>
+            <p style="font-size: 1.1rem; color: var(--text);">Aguardando conteúdo do Mestre...</p>
+            <p style="font-size: 0.8rem; color: var(--text-dim);">Imagens, mapas e vídeos transmitidos pelo regente aparecerão nesta tela.</p>
+          </div>
+        `;
+        return;
+      }
+      const newHash = items.map(i => i.id).join(',');
+      if (newHash === lastMesaHash) return;
+      lastMesaHash = newHash;
+
+      // Show the most recently added item
+      const item = items[items.length - 1];
+      const isVideo = (item.tipo === 'video' || (item.url && (item.url.includes('.mp4') || item.url.startsWith('data:video/'))));
+
+      if (isVideo) {
+        wrapper.innerHTML = `<video src="${item.url}" controls autoplay ${item.loop ? 'loop' : ''} muted style="max-width:96%; max-height:96%; border-radius:4px;"></video>`;
+      } else {
+        wrapper.innerHTML = `<img src="${item.url}" alt="${item.titulo || 'Conteúdo da Mesa'}" style="max-width:96%; max-height:96%; border-radius:4px;">`;
+      }
+    }
+
+    function loadMesaDisplay() {
+      // getMesaContent() from auth.js reads key: rpg_mesa_content
+      const items = (typeof getMesaContent === 'function') ? getMesaContent() : [];
+      renderMesaDisplay(items);
+    }
+
+    // Poll every 3 seconds
+    loadMesaDisplay();
+    setInterval(loadMesaDisplay, 3000);
+
+    // --- DICE LOGIC ---
+    // Uses getDiceHistory() / saveDiceHistory() from auth.js (key: rpg_mesa_dice_history)
+    let selectedSides = 20;
+
+    function selectDice(sides, btn) {
+      selectedSides = sides;
+      document.querySelectorAll('.btn-dice').forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
+    }
+
+    function saveRollToHistory(entry) {
+      // Use auth.js helper if available (correct key rpg_mesa_dice_history)
+      if (typeof getDiceHistory === 'function' && typeof saveDiceHistory === 'function') {
+        const history = getDiceHistory();
+        history.unshift(entry);
+        if (history.length > 100) history.pop();
+        saveDiceHistory(history);
+      }
+      // Also write to plain 'diceHistory' key for registro-sessao.html compatibility
+      try {
+        const h2 = JSON.parse(localStorage.getItem('diceHistory') || '[]');
+        h2.unshift(entry);
+        if (h2.length > 100) h2.pop();
+        localStorage.setItem('diceHistory', JSON.stringify(h2));
+        // Session log
+        const sessionLogs = JSON.parse(localStorage.getItem('sessionLog') || '[]');
+        sessionLogs.unshift({
+          tipo: 'dado',
+          mensagem: `${entry.user} rolou d${entry.sides} [${entry.rawRoll}] bônus ${entry.bonus >= 0 ? '+' : ''}${entry.bonus} = ${entry.total}`,
+          timestamp: entry.timestamp
+        });
+        localStorage.setItem('sessionLog', JSON.stringify(sessionLogs));
+      } catch (e) { console.error(e); }
+    }
+
+    function rollDice(sides, bonus) {
+      const rawRoll = Math.floor(Math.random() * sides) + 1;
+      const total = rawRoll + bonus;
+      const timeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+
+      const entry = {
+        id: 'roll_' + Date.now(),
+        timestamp: timeStr,
+        user: _user.nome || _user.login || 'Jogador',
+        dieType: `d${sides}`,
+        sides: sides,
+        bonus: bonus,
+        result: rawRoll,
+        rawRoll: rawRoll,
+        total: total,
+        sessionId: localStorage.getItem('activeSessionId') || 'sess_ativa'
+      };
+
+      saveRollToHistory(entry);
+      return entry;
+    }
+
+    function handleRollClick() {
+      const bonusInput = document.getElementById('diceBonusInput');
+      const bonus = parseInt(bonusInput.value, 10) || 0;
+      const res = rollDice(selectedSides, bonus);
+
+      // Render Active Result
+      const activeContainer = document.getElementById('activeResultContent');
+      const detailsContainer = document.getElementById('activeRollDetails');
+      const timeLabel = document.getElementById('diceLastRollTime');
+
+      const isNatCrit = (res.sides === 20 && res.rawRoll === 20);
+      const isNatFail = (res.sides === 20 && res.rawRoll === 1);
+
+      let critBadge = '';
+      if (isNatCrit) critBadge = '<span style="color:#27ae60; font-weight:bold; margin-left:6px;">✨ CRÍTICO!</span>';
+      if (isNatFail) critBadge = '<span style="color:#e74c3c; font-weight:bold; margin-left:6px;">💀 FALHA CRÍTICA!</span>';
+
+      activeContainer.innerHTML = `
+        <span>Rolagem: <strong>d${res.sides}</strong></span>
+        <span>Resultado: <span class="dice-result-val">${res.total}</span> ${critBadge}</span>
+      `;
+
+      detailsContainer.innerHTML = `
+        Dado: [${res.rawRoll}] &nbsp;|&nbsp; Bônus: ${res.bonus >= 0 ? '+' : ''}${res.bonus} &nbsp;|&nbsp; ${res.timestamp}
+      `;
+
+      timeLabel.textContent = `Última: ${res.timestamp} por ${res.user}`;
+    }
+
+    // --- PLAYERS SLOTS & WEBCAM LOGIC ---
+    let localStream = null;
+
+    const defaultSlots = [
+      { id: 1, name: 'Jogador 1', char: 'Guerreiro', avatar: 'https://images.unsplash.com/photo-1569003339405-ea396a5a8a90?w=200&auto=format&fit=crop&q=80', isUser: true },
+      { id: 2, name: 'Aeloria', char: 'Maga Élfica', avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&auto=format&fit=crop&q=80', isUser: false },
+      { id: 3, name: 'Thorin', char: 'Clérigo Anão', avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&auto=format&fit=crop&q=80', isUser: false },
+      { id: 4, name: 'Lyra', char: 'Ladina Sombria', avatar: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=200&auto=format&fit=crop&q=80', isUser: false }
+    ];
+
+    function getPlayerSlots() {
+      try {
+        const stored = localStorage.getItem('sessionPlayerSlots');
+        if (stored) return JSON.parse(stored);
+      } catch (e) {}
+
+      // Personalize slot 1 with current user
+      const slots = [...defaultSlots];
+      slots[0].name = currentUser.nome || currentUser.name || 'Meu Herói';
+      return slots;
+    }
+
+    function renderPlayerSlots() {
+      const slots = getPlayerSlots();
+      const container = document.getElementById('playersSlotsContainer');
+      container.innerHTML = '';
+
+      slots.forEach((slot, index) => {
+        const isSelf = slot.isUser || index === 0;
+        const card = document.createElement('div');
+        card.className = `player-slot-card ${isSelf ? 'is-current-user' : ''}`;
+        card.id = `player-slot-${slot.id}`;
+
+        card.innerHTML = `
+          <div class="player-slot-video" id="slot-video-${slot.id}">
+            <img src="${slot.avatar}" alt="${slot.name}" id="slot-img-${slot.id}">
+            <video id="slot-webcam-${slot.id}" autoplay playsinline style="display:none;"></video>
+          </div>
+          <div class="player-meta">
+            <span class="player-slot-name">${slot.name} ${isSelf ? '<span style="color:var(--gold); font-size:0.65rem;">(Você)</span>' : ''}</span>
+            <span class="player-slot-char">${slot.char || 'Aventureiro'}</span>
+          </div>
+          ${isSelf ? `
+            <div class="slot-actions">
+              <button class="btn-slot-action" id="btnToggleCam-${slot.id}" onclick="toggleOwnCamera(${slot.id})">
+                📹 Ativar Câmera
+              </button>
+              <button class="btn-slot-action" onclick="changeSlotImageFromChars(${slot.id})">
+                🖼️ Personagem
+              </button>
+            </div>
+          ` : `
+            <div style="font-size:0.65rem; color:#6b7280; text-align:right;">Conectado</div>
+          `}
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    async function toggleOwnCamera(slotId) {
+      const btn = document.getElementById(`btnToggleCam-${slotId}`);
+      const videoEl = document.getElementById(`slot-webcam-${slotId}`);
+      const imgEl = document.getElementById(`slot-img-${slotId}`);
+
+      if (localStream) {
+        // Stop stream
+        localStream.getTracks().forEach(track => track.stop());
+        localStream = null;
+        videoEl.srcObject = null;
+        videoEl.style.display = 'none';
+        imgEl.style.display = 'block';
+        btn.classList.remove('active');
+        btn.textContent = '📹 Ativar Câmera';
+      } else {
+        try {
+          localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+          videoEl.srcObject = localStream;
+          videoEl.style.display = 'block';
+          imgEl.style.display = 'none';
+          btn.classList.add('active');
+          btn.textContent = '🛑 Desativar Câmera';
+        } catch (err) {
+          console.warn('Erro ao acessar webcam:', err);
+          alert('Não foi possível acessar a câmera do dispositivo. Verifique as permissões de vídeo do seu navegador.');
+        }
+      }
+    }
+
+    function changeSlotImageFromChars(slotId) {
+      try {
+        const rawChars = localStorage.getItem('characters') || localStorage.getItem('personagens');
+        let chars = rawChars ? JSON.parse(rawChars) : [];
+        if (chars.length === 0) {
+          const inputUrl = prompt('Nenhum personagem registrado encontrado. Digite a URL da imagem do seu personagem:');
+          if (inputUrl) {
+            updateSlotAvatar(slotId, inputUrl);
+          }
+          return;
+        }
+
+        const charNames = chars.map((c, i) => `${i + 1}: ${c.name || c.nome}`).join('\n');
+        const choice = prompt(`Selecione um personagem pelo número:\n${charNames}`);
+        const idx = parseInt(choice, 10) - 1;
+        if (!isNaN(idx) && chars[idx]) {
+          const selected = chars[idx];
+          const imgUrl = selected.image || selected.imagem || selected.apresentacaoUrl || 'https://images.unsplash.com/photo-1569003339405-ea396a5a8a90?w=200&auto=format&fit=crop&q=80';
+          updateSlotAvatar(slotId, imgUrl, selected.name || selected.nome, selected.classe || selected.class);
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    function updateSlotAvatar(slotId, url, name, charClass) {
+      const slots = getPlayerSlots();
+      const slot = slots.find(s => s.id === slotId);
+      if (slot) {
+        slot.avatar = url;
+        if (name) slot.name = name;
+        if (charClass) slot.char = charClass;
+        localStorage.setItem('sessionPlayerSlots', JSON.stringify(slots));
+        renderPlayerSlots();
+      }
+    }
+
+    // --- MODAL MESTRE ---
+    function toggleMasterFeedModal() {
+      const modal = document.getElementById('masterCamModal');
+      modal.style.display = (modal.style.display === 'flex') ? 'none' : 'flex';
+    }
+
+    function closeMasterModal(e) {
+      document.getElementById('masterCamModal').style.display = 'none';
+    }
+
+    // Init
+    renderPlayerSlots();
+  </script>
+</body>
+</html>

@@ -1,0 +1,1060 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Registros do Mestre - RPG Virtual</title>
+  <link rel="stylesheet" href="../assets/style.css">
+  <style>
+    .page-header-nav {
+      background: var(--bg-mid);
+      border-bottom: 2px solid var(--gold);
+      padding: 12px 24px;
+    }
+    .header-inner {
+      max-width: 1400px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    /* Top Main Tabs */
+    .top-tabs-bar {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 24px;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 8px;
+    }
+    .top-tab-btn {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      color: var(--text-dim);
+      font-family: inherit;
+      font-weight: 700;
+      font-size: 1rem;
+      padding: 10px 24px;
+      border-radius: 6px 6px 0 0;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+    }
+    .top-tab-btn:hover {
+      color: var(--gold);
+      border-color: var(--gold-dark);
+    }
+    .top-tab-btn.active {
+      background: linear-gradient(180deg, rgba(201, 162, 39, 0.25), rgba(22, 33, 62, 0.9));
+      color: var(--gold);
+      border-color: var(--gold);
+      border-bottom-color: transparent;
+    }
+
+    /* Tab Content Containers */
+    .tab-section {
+      display: none;
+    }
+    .tab-section.active {
+      display: block;
+    }
+
+    /* Sessions Table */
+    .sessions-table-container {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow-x: auto;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+    }
+    .rpg-table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+    }
+    .rpg-table th {
+      background: #111728;
+      color: var(--gold);
+      padding: 14px 16px;
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      border-bottom: 1px solid var(--border);
+    }
+    .rpg-table td {
+      padding: 14px 16px;
+      border-bottom: 1px solid rgba(42, 42, 74, 0.5);
+      font-size: 0.95rem;
+      color: var(--text);
+    }
+    .rpg-table tr:hover td {
+      background: rgba(201, 162, 39, 0.04);
+    }
+
+    .badge-status {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .badge-active {
+      background: rgba(46, 204, 113, 0.2);
+      color: #2ecc71;
+      border: 1px solid #2ecc71;
+    }
+    .badge-concluida {
+      background: rgba(149, 165, 166, 0.2);
+      color: #bdc3c7;
+      border: 1px solid #7f8c8d;
+    }
+
+    /* Modal styling */
+    .modal-backdrop {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.85);
+      z-index: 2000;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .modal-box {
+      background: var(--bg-card);
+      border: 2px solid var(--gold);
+      border-radius: 8px;
+      width: 100%;
+      max-width: 750px;
+      max-height: 85vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.9);
+    }
+    .modal-header {
+      background: var(--bg-mid);
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .modal-header h3 {
+      color: var(--gold);
+      font-size: 1.15rem;
+    }
+    .modal-body {
+      padding: 20px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .modal-footer {
+      background: var(--bg-mid);
+      padding: 12px 20px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      justify-content: flex-end;
+    }
+
+    /* Key points cards */
+    .key-points-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 16px;
+      margin-top: 20px;
+    }
+    .key-point-card {
+      background: var(--bg-mid);
+      border: 1px solid var(--border);
+      border-left: 4px solid var(--gold);
+      border-radius: 6px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      position: relative;
+    }
+    .kp-tag {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      font-weight: bold;
+      color: var(--gold);
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .kp-text {
+      font-size: 0.95rem;
+      color: var(--text);
+      line-height: 1.4;
+    }
+    .kp-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 8px;
+      font-size: 0.75rem;
+      color: var(--text-dim);
+      border-top: 1px solid rgba(255,255,255,0.06);
+      padding-top: 6px;
+    }
+
+    /* Vertical Timeline Styling */
+    .timeline-container {
+      position: relative;
+      max-width: 900px;
+      margin: 30px auto;
+      padding: 20px 0;
+    }
+    .timeline-container::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 50%;
+      width: 4px;
+      background: linear-gradient(180deg, var(--gold), var(--border), var(--gold));
+      transform: translateX(-50%);
+    }
+
+    .timeline-item {
+      position: relative;
+      margin-bottom: 36px;
+      width: 50%;
+    }
+    .timeline-item.left {
+      left: 0;
+      padding-right: 36px;
+    }
+    .timeline-item.right {
+      left: 50%;
+      padding-left: 36px;
+    }
+
+    .timeline-dot {
+      position: absolute;
+      top: 18px;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: var(--bg-dark);
+      border: 3px solid var(--gold);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.7rem;
+      z-index: 2;
+    }
+    .timeline-item.left .timeline-dot {
+      right: -12px;
+    }
+    .timeline-item.right .timeline-dot {
+      left: -12px;
+    }
+
+    .dot-combat { border-color: #e74c3c; color: #e74c3c; }
+    .dot-discovery { border-color: #3498db; color: #3498db; }
+    .dot-dialogue { border-color: #f1c40f; color: #f1c40f; }
+    .dot-rest { border-color: #2ecc71; color: #2ecc71; }
+
+    .timeline-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 16px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.6);
+      transition: transform 0.2s;
+    }
+    .timeline-card:hover {
+      border-color: var(--gold);
+      transform: translateY(-2px);
+    }
+    .timeline-date {
+      font-size: 0.75rem;
+      color: var(--text-dim);
+      margin-bottom: 4px;
+    }
+    .timeline-title {
+      font-size: 1.05rem;
+      color: var(--gold);
+      font-weight: 700;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .timeline-desc {
+      font-size: 0.9rem;
+      color: var(--text);
+      line-height: 1.4;
+      margin-bottom: 8px;
+    }
+    .timeline-players {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 6px;
+      border-top: 1px dashed rgba(255,255,255,0.08);
+      padding-top: 6px;
+    }
+    .player-tag {
+      background: rgba(201, 162, 39, 0.15);
+      border: 1px solid rgba(201, 162, 39, 0.3);
+      color: var(--text);
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-size: 0.75rem;
+    }
+
+    @media (max-width: 768px) {
+      .timeline-container::before {
+        left: 20px;
+      }
+      .timeline-item {
+        width: 100%;
+        left: 0 !important;
+        padding-left: 50px !important;
+        padding-right: 0 !important;
+      }
+      .timeline-item .timeline-dot {
+        left: 8px !important;
+        right: auto !important;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <header class="page-header-nav">
+    <div class="header-inner">
+      <div style="display: flex; align-items: center; gap: 16px;">
+        <a href="../dashboard.html" class="btn-gold" style="padding: 6px 14px; font-size: 0.85rem;">
+          &larr; Voltar ao Painel
+        </a>
+        <h1 style="color: var(--gold); font-size: 1.3rem; letter-spacing: 1.5px; font-weight: 700;">
+          REGISTROS DO MESTRE
+        </h1>
+      </div>
+      <div style="display: flex; align-items: center; gap: 14px;">
+        <span id="userDisplayName" style="font-size: 0.9rem; color: var(--text-dim);">Mestre: ...</span>
+        <button onclick="logout()" class="btn-red" style="padding: 6px 14px; font-size: 0.85rem;">Sair</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="page-wrapper">
+
+    <!-- Top Navigation Tabs -->
+    <div class="top-tabs-bar">
+      <button class="top-tab-btn active" id="tabBtnSessoes" onclick="switchMainTab('sessoes')">
+        <span>&#128197;</span> SESSÕES
+      </button>
+      <button class="top-tab-btn" id="tabBtnPontos" onclick="switchMainTab('pontos')">
+        <span>&#128204;</span> PONTOS CHAVE
+      </button>
+      <button class="top-tab-btn" id="tabBtnEventos" onclick="switchMainTab('eventos')">
+        <span>&#9876;</span> EVENTOS
+      </button>
+    </div>
+
+    <!-- ==================== TAB 1: SESSÕES ==================== -->
+    <section id="sectionSessoes" class="tab-section active">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+        <div>
+          <h2 style="color: var(--gold); font-size: 1.2rem;">Histórico de Sessões</h2>
+          <p style="color: var(--text-dim); font-size: 0.85rem;">Gerencie campanhas, datas e detalhamento de recursos utilizados.</p>
+        </div>
+        <button onclick="openNewSessionModal()" class="btn-gold">
+          + Nova Sessão
+        </button>
+      </div>
+
+      <div class="sessions-table-container">
+        <table class="rpg-table">
+          <thead>
+            <tr>
+              <th>Nome da Sessão</th>
+              <th>Data Início</th>
+              <th>Data Fim</th>
+              <th>Nº Jogadores</th>
+              <th>Status</th>
+              <th style="text-align: right;">Ações</th>
+            </tr>
+          </thead>
+          <tbody id="sessionsTableBody">
+            <!-- Rendered dynamically -->
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ==================== TAB 2: PONTOS CHAVE ==================== -->
+    <section id="sectionPontos" class="tab-section">
+      <div class="card" style="margin-bottom: 24px;">
+        <h3 style="color: var(--gold); font-size: 1.1rem; margin-bottom: 12px;">+ Registrar Novo Ponto Chave</h3>
+        <form id="keyPointForm" onsubmit="handleSaveKeyPoint(event)" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)) 120px; gap: 12px; align-items: flex-end;">
+          <div>
+            <label style="display: block; font-size: 0.8rem; color: var(--text-dim); margin-bottom: 4px;">Sessão:</label>
+            <select id="kpSessionSelect" style="width: 100%; background: var(--bg-dark); border: 1px solid var(--border); color: var(--text); padding: 8px; border-radius: 4px;" required>
+              <!-- Filled with sessions -->
+            </select>
+          </div>
+          <div>
+            <label style="display: block; font-size: 0.8rem; color: var(--text-dim); margin-bottom: 4px;">Tipo de Ponto:</label>
+            <select id="kpTypeSelect" style="width: 100%; background: var(--bg-dark); border: 1px solid var(--border); color: var(--text); padding: 8px; border-radius: 4px;">
+              <option value="nota">&#128221; Nota Importante</option>
+              <option value="imagem">&#128444; Imagem Revelada</option>
+              <option value="evento">&#9889; Acontecimento Decisivo</option>
+              <option value="dado">&#127922; Rolagem Crítica</option>
+            </select>
+          </div>
+          <div style="grid-column: span 2;">
+            <label style="display: block; font-size: 0.8rem; color: var(--text-dim); margin-bottom: 4px;">Descrição / Revelação:</label>
+            <input type="text" id="kpDescription" placeholder="Ex: O grupo descobriu o selo proibido do templo..." style="width: 100%; background: var(--bg-dark); border: 1px solid var(--border); color: var(--text); padding: 8px; border-radius: 4px;" required />
+          </div>
+          <button type="submit" class="btn-gold" style="height: 38px;">Adicionar</button>
+        </form>
+      </div>
+
+      <div style="display: flex; justify-content: space-between; align-items: center;">
+        <h3 style="color: var(--gold); font-size: 1.15rem;">Pontos Marcados</h3>
+        <div>
+          <label style="font-size: 0.85rem; color: var(--text-dim); margin-right: 8px;">Filtrar por Sessão:</label>
+          <select id="kpFilterSession" onchange="renderKeyPoints()" style="background: var(--bg-dark); border: 1px solid var(--border); color: var(--text); padding: 6px 12px; border-radius: 4px;">
+            <option value="ALL">Todas as Sessões</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="key-points-grid" id="keyPointsGrid">
+        <!-- Rendered Key Points -->
+      </div>
+    </section>
+
+    <!-- ==================== TAB 3: EVENTOS (TIMELINE) ==================== -->
+    <section id="sectionEventos" class="tab-section">
+      <div class="card" style="margin-bottom: 24px;">
+        <h3 style="color: var(--gold); font-size: 1.1rem; margin-bottom: 12px;">+ Adicionar Evento à Linha do Tempo</h3>
+        <form id="eventForm" onsubmit="handleSaveEvent(event)" style="display: flex; flex-direction: column; gap: 14px;">
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px;">
+            <div>
+              <label style="display: block; font-size: 0.8rem; color: var(--text-dim); margin-bottom: 4px;">Título do Evento:</label>
+              <input type="text" id="evTitle" placeholder="Ex: Batalha na Ponte Quebrada" style="width: 100%; background: var(--bg-dark); border: 1px solid var(--border); color: var(--text); padding: 8px; border-radius: 4px;" required />
+            </div>
+            <div>
+              <label style="display: block; font-size: 0.8rem; color: var(--text-dim); margin-bottom: 4px;">Tipo de Evento:</label>
+              <select id="evType" style="width: 100%; background: var(--bg-dark); border: 1px solid var(--border); color: var(--text); padding: 8px; border-radius: 4px;">
+                <option value="combat">&#9876; Combate (Combat)</option>
+                <option value="discovery">&#128269; Descoberta (Discovery)</option>
+                <option value="dialogue">&#128483; Diálogo / Encontro (Dialogue)</option>
+                <option value="rest">&#127957; Descanso (Rest)</option>
+              </select>
+            </div>
+            <div>
+              <label style="display: block; font-size: 0.8rem; color: var(--text-dim); margin-bottom: 4px;">Sessão Relacionada:</label>
+              <select id="evSessionSelect" style="width: 100%; background: var(--bg-dark); border: 1px solid var(--border); color: var(--text); padding: 8px; border-radius: 4px;" required>
+                <!-- Filled with sessions -->
+              </select>
+            </div>
+          </div>
+
+          <div>
+            <label style="display: block; font-size: 0.8rem; color: var(--text-dim); margin-bottom: 4px;">Descrição Detalhada:</label>
+            <textarea id="evDesc" rows="3" placeholder="Descreva os acontecimentos relevantes..." style="width: 100%; background: var(--bg-dark); border: 1px solid var(--border); color: var(--text); padding: 8px; border-radius: 4px; font-family: inherit;" required></textarea>
+          </div>
+
+          <div>
+            <label style="display: block; font-size: 0.8rem; color: var(--text-dim); margin-bottom: 6px;">Jogadores Envolvidos:</label>
+            <div id="evPlayersCheckboxGroup" style="display: flex; flex-wrap: wrap; gap: 12px; background: rgba(13, 13, 26, 0.6); padding: 10px; border-radius: 4px; border: 1px solid var(--border);">
+              <!-- Checkboxes populated from users list -->
+            </div>
+          </div>
+
+          <div style="display: flex; justify-content: flex-end;">
+            <button type="submit" class="btn-gold" style="padding: 10px 24px;">Registrar Evento</button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Timeline View -->
+      <div style="display: flex; justify-content: space-between; align-items: center;">
+        <h3 style="color: var(--gold); font-size: 1.15rem;">Linha do Tempo Cronológica</h3>
+        <div>
+          <label style="font-size: 0.85rem; color: var(--text-dim); margin-right: 8px;">Filtrar por Sessão:</label>
+          <select id="evFilterSession" onchange="renderEventsTimeline()" style="background: var(--bg-dark); border: 1px solid var(--border); color: var(--text); padding: 6px 12px; border-radius: 4px;">
+            <option value="ALL">Todas as Sessões</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="timeline-container" id="timelineContainer">
+        <!-- Vertical timeline nodes rendered here -->
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ==================== MODAL: DETALHES DA SESSÃO ==================== -->
+  <div class="modal-backdrop" id="modalSessionDetails">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3 id="modalSessionTitle">Detalhes da Sessão</h3>
+        <button onclick="closeModalDetails()" style="background: none; border: none; color: var(--text-dim); font-size: 1.4rem; cursor: pointer;">&times;</button>
+      </div>
+      <div class="modal-body">
+        
+        <div>
+          <h4 style="color: var(--gold); font-size: 0.95rem; margin-bottom: 6px;">&#128444; Imagens Utilizadas na Sessão:</h4>
+          <div id="modalImagensList" style="display: flex; flex-wrap: wrap; gap: 8px; background: rgba(0,0,0,0.4); padding: 10px; border-radius: 4px; min-height: 48px;"></div>
+        </div>
+
+        <div>
+          <h4 style="color: var(--gold); font-size: 0.95rem; margin-bottom: 6px;">&#127916; Vídeos Utilizados:</h4>
+          <div id="modalVideosList" style="display: flex; flex-wrap: wrap; gap: 8px; background: rgba(0,0,0,0.4); padding: 10px; border-radius: 4px; min-height: 48px;"></div>
+        </div>
+
+        <div>
+          <h4 style="color: var(--gold); font-size: 0.95rem; margin-bottom: 6px;">&#127922; Rolagens de Dados (Histórico da Sessão):</h4>
+          <div id="modalDiceList" style="max-height: 150px; overflow-y: auto; background: rgba(0,0,0,0.4); padding: 10px; border-radius: 4px; font-size: 0.85rem; display: flex; flex-direction: column; gap: 4px;"></div>
+        </div>
+
+        <div>
+          <h4 style="color: var(--gold); font-size: 0.95rem; margin-bottom: 6px;">&#128221; Conteúdos e Recursos Adicionados:</h4>
+          <div id="modalConteudoList" style="max-height: 120px; overflow-y: auto; background: rgba(0,0,0,0.4); padding: 10px; border-radius: 4px; font-size: 0.85rem;"></div>
+        </div>
+
+      </div>
+      <div class="modal-footer">
+        <button onclick="closeModalDetails()" class="btn-gold" style="padding: 6px 16px;">Fechar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== MODAL: NOVA SESSÃO ==================== -->
+  <div class="modal-backdrop" id="modalNewSession">
+    <div class="modal-box" style="max-width: 450px;">
+      <div class="modal-header">
+        <h3>Criar Nova Sessão</h3>
+        <button onclick="closeNewSessionModal()" style="background: none; border: none; color: var(--text-dim); font-size: 1.4rem; cursor: pointer;">&times;</button>
+      </div>
+      <div class="modal-body">
+        <label style="font-size: 0.85rem; color: var(--text-dim);">Nome da Sessão / Campanha:</label>
+        <input type="text" id="newSessionNameInput" placeholder="Ex: Sessão 3: A Vingança do Lich" style="width: 100%; background: var(--bg-dark); border: 1px solid var(--border); color: var(--text); padding: 10px; border-radius: 4px;" required />
+      </div>
+      <div class="modal-footer" style="gap: 10px;">
+        <button onclick="closeNewSessionModal()" class="btn-red" style="padding: 6px 16px;">Cancelar</button>
+        <button onclick="confirmCreateSession()" class="btn-gold" style="padding: 6px 16px;">Criar Sessão</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="../assets/auth.js"></script>
+  <script>
+    // 1. Auth Guard
+    const currentUser = requireMestre();
+    if (currentUser) {
+      document.getElementById('userDisplayName').textContent = `Mestre: ${currentUser.nome || currentUser.login}`;
+    }
+
+    const STORAGE_EXT = {
+      SESSIONS: 'rpg_mesa_sessions',
+      KEY_POINTS: 'rpg_mesa_key_points',
+      EVENTS: 'rpg_mesa_events',
+      DICE: 'rpg_mesa_dice_history',
+      MESA_CONTENT: 'rpg_mesa_content',
+      CONTEUDOS_HISTORY: 'conteudosHistory'
+    };
+
+    // 2. Tab Navigation
+    function switchMainTab(tab) {
+      document.getElementById('tabBtnSessoes').classList.toggle('active', tab === 'sessoes');
+      document.getElementById('tabBtnPontos').classList.toggle('active', tab === 'pontos');
+      document.getElementById('tabBtnEventos').classList.toggle('active', tab === 'eventos');
+
+      document.getElementById('sectionSessoes').classList.toggle('active', tab === 'sessoes');
+      document.getElementById('sectionPontos').classList.toggle('active', tab === 'pontos');
+      document.getElementById('sectionEventos').classList.toggle('active', tab === 'eventos');
+
+      if (tab === 'sessoes') renderSessionsTable();
+      if (tab === 'pontos') {
+        populateSessionSelects();
+        renderKeyPoints();
+      }
+      if (tab === 'eventos') {
+        populateSessionSelects();
+        populatePlayersCheckboxes();
+        renderEventsTimeline();
+      }
+    }
+
+    // 3. Initialize default session data if empty
+    function ensureInitialData() {
+      let sessions = getSessions();
+      if (!sessions || sessions.length === 0) {
+        sessions = [
+          {
+            id: 'sess_1',
+            nome: 'Sessão 1: Os Murmúrios do Pântano Negro',
+            startTime: '2026-10-10T19:00:00.000Z',
+            endTime: '2026-10-10T23:30:00.000Z',
+            playerCount: 4,
+            status: 'concluida'
+          },
+          {
+            id: 'sess_2',
+            nome: 'Sessão 2: A Cidadela Esquecida',
+            startTime: '2026-10-11T18:00:00.000Z',
+            endTime: null,
+            playerCount: 5,
+            status: 'active'
+          }
+        ];
+        saveSessions(sessions);
+      } else {
+        // Ensure standard fields
+        sessions = sessions.map((s, idx) => ({
+          id: s.id || ('sess_' + idx),
+          nome: s.nome || s.titulo || 'Sessão ' + (idx + 1),
+          startTime: s.startTime || s.data || new Date().toISOString(),
+          endTime: s.endTime || null,
+          playerCount: s.playerCount || 4,
+          status: s.status || 'active'
+        }));
+        saveSessions(sessions);
+      }
+
+      // Default Key Points
+      if (!localStorage.getItem(STORAGE_EXT.KEY_POINTS)) {
+        const defaultKP = [
+          {
+            id: 'kp_1',
+            sessionId: 'sess_1',
+            type: 'evento',
+            description: 'O grupo encontrou a chave de obsidiana na garganta do troll da ponte.',
+            timestamp: new Date(Date.now() - 86400000).toISOString()
+          },
+          {
+            id: 'kp_2',
+            sessionId: 'sess_1',
+            type: 'dado',
+            description: 'Valerius tirou d20 Crítico (20 natural) no teste de percepção mágica.',
+            timestamp: new Date(Date.now() - 80000000).toISOString()
+          },
+          {
+            id: 'kp_3',
+            sessionId: 'sess_2',
+            type: 'imagem',
+            description: 'Revelação do mapa das catacumbas secretas do templo.',
+            timestamp: new Date().toISOString()
+          }
+        ];
+        localStorage.setItem(STORAGE_EXT.KEY_POINTS, JSON.stringify(defaultKP));
+      }
+
+      // Default Events
+      if (!localStorage.getItem(STORAGE_EXT.EVENTS)) {
+        const defaultEvents = [
+          {
+            id: 'ev_1',
+            sessionId: 'sess_1',
+            title: 'Emboscada na Floresta',
+            type: 'combat',
+            description: 'Bandidos atacaram a carruagem real com flechas flamejantes.',
+            players: ['Aventureiro Valente', 'Mestre'],
+            timestamp: '2026-10-10T19:30:00.000Z'
+          },
+          {
+            id: 'ev_2',
+            sessionId: 'sess_1',
+            title: 'Descoberta do Monólito Rúnico',
+            type: 'discovery',
+            description: 'Inscrições antigas em dracônico foram decifradas pelo ladino.',
+            players: ['Aventureiro Valente'],
+            timestamp: '2026-10-10T21:15:00.000Z'
+          },
+          {
+            id: 'ev_3',
+            sessionId: 'sess_2',
+            title: 'Audiência com a Rainha Élfica',
+            type: 'dialogue',
+            description: 'Diplomacia tensa sobre a passagem segura pelas montanhas.',
+            players: ['Aventureiro Valente', 'Mestre'],
+            timestamp: '2026-10-11T18:30:00.000Z'
+          }
+        ];
+        localStorage.setItem(STORAGE_EXT.EVENTS, JSON.stringify(defaultEvents));
+      }
+    }
+
+    // 4. SESSÕES TAB Logic
+    function renderSessionsTable() {
+      const tbody = document.getElementById('sessionsTableBody');
+      const sessions = getSessions();
+      tbody.innerHTML = '';
+
+      if (sessions.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: var(--text-dim); padding: 30px;">Nenhuma sessão registrada.</td></tr>`;
+        return;
+      }
+
+      sessions.forEach(sess => {
+        const tr = document.createElement('tr');
+        
+        const isConcluida = (sess.status === 'concluida');
+        const statusBadge = isConcluida 
+          ? `<span class="badge-status badge-concluida">Concluída</span>`
+          : `<span class="badge-status badge-active">Em Andamento</span>`;
+
+        const startStr = sess.startTime ? new Date(sess.startTime).toLocaleString('pt-BR') : '-';
+        const endStr = sess.endTime ? new Date(sess.endTime).toLocaleString('pt-BR') : '-';
+
+        tr.innerHTML = `
+          <td><strong>${sess.nome}</strong></td>
+          <td>${startStr}</td>
+          <td>${endStr}</td>
+          <td>${sess.playerCount || 4}</td>
+          <td>${statusBadge}</td>
+          <td style="text-align: right; display: flex; justify-content: flex-end; gap: 8px;">
+            <button class="btn-gold" style="padding: 5px 12px; font-size: 0.8rem;" onclick="viewSessionDetails('${sess.id}')">
+              Ver Detalhes
+            </button>
+            ${!isConcluida ? `
+              <button class="btn-red" style="padding: 5px 12px; font-size: 0.8rem;" onclick="endSession('${sess.id}')">
+                Encerrar Sessão
+              </button>
+            ` : ''}
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function openNewSessionModal() {
+      document.getElementById('newSessionNameInput').value = '';
+      document.getElementById('modalNewSession').style.display = 'flex';
+    }
+
+    function closeNewSessionModal() {
+      document.getElementById('modalNewSession').style.display = 'none';
+    }
+
+    function confirmCreateSession() {
+      const name = document.getElementById('newSessionNameInput').value.trim();
+      if (!name) {
+        alert('Por favor, informe o nome da sessão.');
+        return;
+      }
+      let sessions = getSessions();
+      const newSess = {
+        id: 'sess_' + Date.now(),
+        nome: name,
+        startTime: new Date().toISOString(),
+        endTime: null,
+        playerCount: getUsers().length || 4,
+        status: 'active'
+      };
+      sessions.unshift(newSess);
+      saveSessions(sessions);
+      closeNewSessionModal();
+      renderSessionsTable();
+      populateSessionSelects();
+    }
+
+    function endSession(sessId) {
+      if (!confirm('Deseja realmente encerrar esta sessão ativa?')) return;
+      let sessions = getSessions();
+      sessions = sessions.map(s => {
+        if (s.id === sessId) {
+          s.status = 'concluida';
+          s.endTime = new Date().toISOString();
+        }
+        return s;
+      });
+      saveSessions(sessions);
+      renderSessionsTable();
+    }
+
+    // Modal Details logic
+    function viewSessionDetails(sessId) {
+      const sessions = getSessions();
+      const sess = sessions.find(s => s.id === sessId);
+      if (!sess) return;
+
+      document.getElementById('modalSessionTitle').textContent = `Detalhes: ${sess.nome}`;
+      
+      // Imagens e Vídeos
+      const imgContainer = document.getElementById('modalImagensList');
+      const vidContainer = document.getElementById('modalVideosList');
+      const diceContainer = document.getElementById('modalDiceList');
+      const contentContainer = document.getElementById('modalConteudoList');
+
+      imgContainer.innerHTML = '';
+      vidContainer.innerHTML = '';
+      diceContainer.innerHTML = '';
+      contentContainer.innerHTML = '';
+
+      // Get contents used
+      const conteudosHistory = JSON.parse(localStorage.getItem(STORAGE_EXT.CONTEUDOS_HISTORY)) || [];
+      const mesaContent = JSON.parse(localStorage.getItem(STORAGE_EXT.MESA_CONTENT)) || [];
+      const diceHistory = getDiceHistory();
+
+      // Combined resources
+      let imagesFound = 0;
+      let videosFound = 0;
+
+      mesaContent.forEach(item => {
+        const isVid = (item.tipo === 'video' || (item.url && item.url.includes('.mp4')));
+        if (isVid) {
+          videosFound++;
+          vidContainer.innerHTML += `<span class="player-tag">&#127916; ${item.titulo || 'Vídeo de Campanha'}</span>`;
+        } else {
+          imagesFound++;
+          imgContainer.innerHTML += `<span class="player-tag">&#128444; ${item.titulo || 'Imagem da Mesa'}</span>`;
+        }
+      });
+
+      if (imagesFound === 0) imgContainer.innerHTML = '<span style="color:var(--text-dim); font-size:0.8rem;">Nenhuma imagem ativa na mesa.</span>';
+      if (videosFound === 0) vidContainer.innerHTML = '<span style="color:var(--text-dim); font-size:0.8rem;">Nenhum vídeo registrado.</span>';
+
+      // Dice rolls for this session (filter by sessionId if available, or list last 15)
+      const sessionDice = diceHistory.filter(d => !d.sessionId || d.sessionId === sessId);
+      if (sessionDice.length === 0) {
+        diceContainer.innerHTML = '<span style="color:var(--text-dim);">Nenhuma rolagem de dados gravada para esta sessão.</span>';
+      } else {
+        sessionDice.slice(0, 15).forEach(d => {
+          const item = document.createElement('div');
+          item.style.padding = '3px 0';
+          item.innerHTML = `<strong>${d.user || 'Jogador'}</strong> rolou <strong>${d.dieType}</strong> &rarr; Resultado: <span style="color:var(--gold); font-weight:bold;">${d.total}</span> <span style="color:var(--text-dim); font-size:0.75rem;">(${new Date(d.timestamp).toLocaleTimeString()})</span>`;
+          diceContainer.appendChild(item);
+        });
+      }
+
+      // Conteúdos adicionados
+      if (conteudosHistory.length === 0) {
+        contentContainer.innerHTML = '<span style="color:var(--text-dim);">Nenhum registro histórico de conteúdos nesta sessão.</span>';
+      } else {
+        conteudosHistory.slice(0, 10).forEach(c => {
+          contentContainer.innerHTML += `<div>&bull; [${c.tipo}] <strong>${c.name}</strong> adicionado em ${new Date(c.timestamp).toLocaleString('pt-BR')}</div>`;
+        });
+      }
+
+      document.getElementById('modalSessionDetails').style.display = 'flex';
+    }
+
+    function closeModalDetails() {
+      document.getElementById('modalSessionDetails').style.display = 'none';
+    }
+
+    // 5. PONTOS CHAVE Logic
+    function populateSessionSelects() {
+      const sessions = getSessions();
+      const kpSelect = document.getElementById('kpSessionSelect');
+      const kpFilter = document.getElementById('kpFilterSession');
+      const evSelect = document.getElementById('evSessionSelect');
+      const evFilter = document.getElementById('evFilterSession');
+
+      kpSelect.innerHTML = '';
+      kpFilter.innerHTML = '<option value="ALL">Todas as Sessões</option>';
+      evSelect.innerHTML = '';
+      evFilter.innerHTML = '<option value="ALL">Todas as Sessões</option>';
+
+      sessions.forEach(s => {
+        kpSelect.innerHTML += `<option value="${s.id}">${s.nome}</option>`;
+        kpFilter.innerHTML += `<option value="${s.id}">${s.nome}</option>`;
+        evSelect.innerHTML += `<option value="${s.id}">${s.nome}</option>`;
+        evFilter.innerHTML += `<option value="${s.id}">${s.nome}</option>`;
+      });
+    }
+
+    function handleSaveKeyPoint(e) {
+      e.preventDefault();
+      const sessId = document.getElementById('kpSessionSelect').value;
+      const type = document.getElementById('kpTypeSelect').value;
+      const desc = document.getElementById('kpDescription').value.trim();
+
+      if (!desc) return;
+
+      let keyPoints = JSON.parse(localStorage.getItem(STORAGE_EXT.KEY_POINTS)) || [];
+      keyPoints.unshift({
+        id: 'kp_' + Date.now(),
+        sessionId: sessId,
+        type: type,
+        description: desc,
+        timestamp: new Date().toISOString()
+      });
+      localStorage.setItem(STORAGE_EXT.KEY_POINTS, JSON.stringify(keyPoints));
+
+      document.getElementById('kpDescription').value = '';
+      renderKeyPoints();
+    }
+
+    function deleteKeyPoint(id) {
+      let keyPoints = JSON.parse(localStorage.getItem(STORAGE_EXT.KEY_POINTS)) || [];
+      keyPoints = keyPoints.filter(k => k.id !== id);
+      localStorage.setItem(STORAGE_EXT.KEY_POINTS, JSON.stringify(keyPoints));
+      renderKeyPoints();
+    }
+
+    function renderKeyPoints() {
+      const container = document.getElementById('keyPointsGrid');
+      const filter = document.getElementById('kpFilterSession').value;
+      let keyPoints = JSON.parse(localStorage.getItem(STORAGE_EXT.KEY_POINTS)) || [];
+      const sessions = getSessions();
+
+      if (filter !== 'ALL') {
+        keyPoints = keyPoints.filter(k => k.sessionId === filter);
+      }
+
+      container.innerHTML = '';
+      if (keyPoints.length === 0) {
+        container.innerHTML = '<div style="grid-column: 1/-1; text-align: center; color: var(--text-dim); padding: 30px;">Nenhum ponto chave cadastrado.</div>';
+        return;
+      }
+
+      const typeIcons = {
+        nota: '&#128221; NOTA',
+        imagem: '&#128444; IMAGEM',
+        evento: '&#9889; EVENTO',
+        dado: '&#127922; DADO'
+      };
+
+      keyPoints.forEach(kp => {
+        const sessObj = sessions.find(s => s.id === kp.sessionId);
+        const card = document.createElement('div');
+        card.className = 'key-point-card';
+        card.innerHTML = `
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <span class="kp-tag">${typeIcons[kp.type] || 'NOTA'}</span>
+            <button onclick="deleteKeyPoint('${kp.id}')" style="background:none; border:none; color:var(--red-light); cursor:pointer; font-weight:bold;" title="Excluir">&times;</button>
+          </div>
+          <div class="kp-text">${kp.description}</div>
+          <div class="kp-footer">
+            <span>${sessObj ? sessObj.nome : 'Sessão'}</span>
+            <span>${new Date(kp.timestamp).toLocaleDateString('pt-BR')}</span>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    // 6. EVENTOS (TIMELINE) Logic
+    function populatePlayersCheckboxes() {
+      const group = document.getElementById('evPlayersCheckboxGroup');
+      const users = getUsers();
+      group.innerHTML = '';
+
+      users.forEach(u => {
+        const label = document.createElement('label');
+        label.style.display = 'flex';
+        label.style.alignItems = 'center';
+        label.style.gap = '6px';
+        label.style.cursor = 'pointer';
+        label.style.fontSize = '0.85rem';
+        label.innerHTML = `
+          <input type="checkbox" name="evPlayer" value="${u.nome || u.login}">
+          <span>${u.nome || u.login} (${u.perfil})</span>
+        `;
+        group.appendChild(label);
+      });
+    }
+
+    function handleSaveEvent(e) {
+      e.preventDefault();
+      const title = document.getElementById('evTitle').value.trim();
+      const type = document.getElementById('evType').value;
+      const sessionId = document.getElementById('evSessionSelect').value;
+      const desc = document.getElementById('evDesc').value.trim();
+
+      const checkedPlayers = Array.from(document.querySelectorAll('input[name="evPlayer"]:checked')).map(c => c.value);
+
+      let events = JSON.parse(localStorage.getItem(STORAGE_EXT.EVENTS)) || [];
+      events.push({
+        id: 'ev_' + Date.now(),
+        sessionId: sessionId,
+        title: title,
+        type: type,
+        description: desc,
+        players: checkedPlayers,
+        timestamp: new Date().toISOString()
+      });
+      localStorage.setItem(STORAGE_EXT.EVENTS, JSON.stringify(events));
+
+      document.getElementById('eventForm').reset();
+      renderEventsTimeline();
+    }
+
+    function renderEventsTimeline() {
+      const container = document.getElementById('timelineContainer');
+      const filter = document.getElementById('evFilterSession').value;
+      let events = JSON.parse(localStorage.getItem(STORAGE_EXT.EVENTS)) || [];
+
+      if (filter !== 'ALL') {
+        events = events.filter(e => e.sessionId === filter);
+      }
+
+      // Chronological order
+      events.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+
+      container.innerHTML = '';
+      if (events.length === 0) {
+        container.innerHTML = '<div style="text-align: center; color: var(--text-dim); padding: 40px;">Nenhum evento registrado nesta linha do tempo.</div>';
+        return;
+      }
+
+      const typeDetails = {
+        combat: { icon: '&#9876;', label: 'Combate', dotClass: 'dot-combat' },
+        discovery: { icon: '&#128269;', label: 'Descoberta', dotClass: 'dot-discovery' },
+        dialogue: { icon: '&#128483;', label: 'Diálogo', dotClass: 'dot-dialogue' },
+        rest: { icon: '&#127957;', label: 'Descanso', dotClass: 'dot-rest' }
+      };
+
+      events.forEach((ev, index) => {
+        const isLeft = (index % 2 === 0);
+        const info = typeDetails[ev.type] || { icon: '&#9889;', label: 'Evento', dotClass: 'dot-combat' };
+
+        const itemEl = document.createElement('div');
+        itemEl.className = `timeline-item ${isLeft ? 'left' : 'right'}`;
+
+        let playerTags = '';
+        if (ev.players && ev.players.length > 0) {
+          playerTags = ev.players.map(p => `<span class="player-tag">&#128100; ${p}</span>`).join('');
+        } else {
+          playerTags = '<span style="font-size:0.75rem; color:var(--text-dim);">Sem jogadores específicos</span>';
+        }
+
+        itemEl.innerHTML = `
+          <div class="timeline-dot ${info.dotClass}">${info.icon}</div>
+          <div class="timeline-card">
+            <div class="timeline-date">${new Date(ev.timestamp).toLocaleString('pt-BR')} &bull; ${info.label}</div>
+            <div class="timeline-title">${info.icon} ${ev.title}</div>
+            <div class="timeline-desc">${ev.description}</div>
+            <div class="timeline-players">${playerTags}</div>
+          </div>
+        `;
+        container.appendChild(itemEl);
+      });
+    }
+
+    // Initialize on page load
+    document.addEventListener('DOMContentLoaded', () => {
+      ensureInitialData();
+      renderSessionsTable();
+      populateSessionSelects();
+      populatePlayersCheckboxes();
+      renderKeyPoints();
+      renderEventsTimeline();
+    });
+  </script>
+</body>
+</html>

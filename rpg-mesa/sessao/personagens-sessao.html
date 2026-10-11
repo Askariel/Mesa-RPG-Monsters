@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PERSONAGENS NA SESSÃO | RPG de Mesa</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=MedievalSharp&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/style.css">
+  <style>
+    :root {
+      --bg-dark: #0d0d1a;
+      --bg-mid: #1a1a2e;
+      --bg-card: #16213e;
+      --gold: #c9a227;
+      --gold-bright: #ffd700;
+      --red: #8b0000;
+      --red-bright: #c0392b;
+      --blue: #1b4d89;
+      --blue-bright: #2980b9;
+      --text: #e8d5b7;
+      --text-dim: #a89070;
+      --border: #2a2a4a;
+      --border-gold: #c9a22744;
+      --font-rpg: 'Cinzel', serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      color: var(--text);
+      font-family: var(--font-rpg);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      background-image: 
+        radial-gradient(circle at 50% 20%, rgba(26, 26, 46, 0.8) 0%, rgba(13, 13, 26, 0.98) 80%),
+        repeating-linear-gradient(0deg, rgba(201, 162, 39, 0.015) 0px, rgba(201, 162, 39, 0.015) 1px, transparent 1px, transparent 30px);
+    }
+
+    /* TOP NAVBAR */
+    .rpg-navbar {
+      background: linear-gradient(180deg, #18182c 0%, #101020 100%);
+      border-bottom: 2px solid var(--gold);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.7);
+      padding: 10px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      z-index: 100;
+    }
+
+    .nav-left {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .btn-nav-back {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px;
+      background: rgba(22, 33, 62, 0.8);
+      color: var(--gold);
+      border: 1px solid var(--gold);
+      border-radius: 4px;
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 600;
+      letter-spacing: 1px;
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+
+    .btn-nav-back:hover {
+      background: var(--gold);
+      color: #0d0d1a;
+      box-shadow: 0 0 12px rgba(201, 162, 39, 0.5);
+    }
+
+    .nav-title {
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: var(--gold);
+      letter-spacing: 2px;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8), 0 0 10px rgba(201, 162, 39, 0.4);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    /* MAIN CONTAINER */
+    .personagens-container {
+      max-width: 1200px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 24px 20px 40px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    .page-header-intro {
+      background: rgba(22, 33, 62, 0.7);
+      border: 1px solid var(--border-gold);
+      border-radius: 6px;
+      padding: 16px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .page-header-intro h2 {
+      font-size: 1.2rem;
+      color: var(--gold);
+      letter-spacing: 1.5px;
+      margin-bottom: 4px;
+    }
+
+    .page-header-intro p {
+      font-size: 0.85rem;
+      color: var(--text-dim);
+    }
+
+    .roster-count-badge {
+      background: #0f1526;
+      border: 1px solid var(--border-gold);
+      padding: 6px 16px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      color: var(--gold);
+      font-weight: 700;
+    }
+
+    /* CHARACTERS GRID */
+    .characters-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 22px;
+    }
+
+    .character-card {
+      background: rgba(22, 33, 62, 0.85);
+      border: 1px solid var(--border);
+      border-top: 2px solid var(--gold);
+      border-radius: 6px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.6);
+      transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+      position: relative;
+    }
+
+    .character-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.8), 0 0 15px rgba(201, 162, 39, 0.25);
+      border-color: var(--gold);
+    }
+
+    .char-image-wrapper {
+      position: relative;
+      width: 100%;
+      height: 240px;
+      background: #070912;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    .char-image-wrapper img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: top center;
+      transition: transform 0.3s ease;
+    }
+
+    .character-card:hover .char-image-wrapper img {
+      transform: scale(1.04);
+    }
+
+    .char-class-badge {
+      position: absolute;
+      bottom: 8px;
+      right: 8px;
+      background: rgba(13, 13, 26, 0.88);
+      border: 1px solid var(--gold);
+      padding: 3px 10px;
+      border-radius: 3px;
+      font-size: 0.75rem;
+      color: var(--gold-bright);
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      backdrop-filter: blur(4px);
+    }
+
+    .char-card-body {
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      flex: 1;
+    }
+
+    .char-header-info {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .char-name {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--gold);
+      letter-spacing: 1px;
+    }
+
+    .player-name {
+      font-size: 0.8rem;
+      color: var(--text-dim);
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    /* VITALS IN CARD */
+    .card-vitals {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 4px;
+      background: #0a0e1b;
+      padding: 10px;
+      border-radius: 4px;
+      border: 1px solid var(--border);
+    }
+
+    .bar-line {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .bar-info {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+
+    .stat-track {
+      background: #05070e;
+      height: 10px;
+      border-radius: 5px;
+      overflow: hidden;
+      border: 1px solid #1a2238;
+    }
+
+    .stat-fill {
+      height: 100%;
+      border-radius: 5px;
+      transition: width 0.3s ease;
+    }
+
+    .stat-fill.hp {
+      background: linear-gradient(90deg, #8b0000 0%, #e74c3c 100%);
+    }
+
+    .stat-fill.mana {
+      background: linear-gradient(90deg, #1b4d89 0%, #3498db 100%);
+    }
+
+    /* EMPTY STATE */
+    .empty-state {
+      background: rgba(22, 33, 62, 0.5);
+      border: 2px dashed var(--border-gold);
+      border-radius: 8px;
+      padding: 60px 20px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+      color: var(--text-dim);
+    }
+
+    .empty-state-icon {
+      font-size: 3.5rem;
+      color: var(--gold);
+      opacity: 0.6;
+    }
+
+    .empty-state h3 {
+      font-size: 1.3rem;
+      color: var(--gold);
+    }
+
+    .empty-state p {
+      max-width: 480px;
+      font-size: 0.9rem;
+      line-height: 1.5;
+    }
+
+    /* QUICK NAVIGATION BAR */
+    .quick-nav-bar {
+      background: #101322;
+      border-top: 1px solid var(--border-gold);
+      padding: 10px 16px;
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .quick-nav-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(22, 33, 62, 0.9);
+      color: var(--text);
+      border: 1px solid var(--border);
+      padding: 8px 18px;
+      border-radius: 4px;
+      text-decoration: none;
+      font-size: 0.85rem;
+      font-weight: 600;
+      letter-spacing: 1px;
+      transition: all 0.2s ease;
+    }
+
+    .quick-nav-btn:hover {
+      border-color: var(--gold);
+      color: var(--gold);
+      background: rgba(201, 162, 39, 0.1);
+      box-shadow: 0 0 10px rgba(201, 162, 39, 0.25);
+    }
+
+    .quick-nav-btn.active {
+      background: var(--gold);
+      color: #0d0d1a;
+      border-color: #ffd700;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- TOP NAVBAR -->
+  <header class="rpg-navbar">
+    <div class="nav-left">
+      <a href="../dashboard.html" class="btn-nav-back" title="Voltar ao Painel">
+        <span>&larr;</span> Painel
+      </a>
+      <a href="hub.html" class="btn-nav-back" style="border-color:var(--border);" title="Ir para o Hub">
+        <span>🏰</span> Hub da Mesa
+      </a>
+      <div class="nav-title">
+        <span>⚔️</span> PERSONAGENS NA SESSÃO
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN ROSTER CONTAINER -->
+  <main class="personagens-container">
+
+    <!-- INTRO BAR -->
+    <div class="page-header-intro">
+      <div>
+        <h2>Heróis em Batalha</h2>
+        <p>Aventureiros habilitados pelo Mestre para participar da sessão atual.</p>
+      </div>
+      <div class="roster-count-badge" id="rosterCountBadge">
+        0 Personagens em Mesa
+      </div>
+    </div>
+
+    <!-- CHARACTERS GRID -->
+    <section id="charactersGridContainer" class="characters-grid">
+      <!-- Dynamic cards rendered here -->
+    </section>
+
+    <!-- EMPTY STATE -->
+    <div id="emptyStateContainer" class="empty-state" style="display:none;">
+      <div class="empty-state-icon">🛡️</div>
+      <h3>Nenhum personagem selecionado pelo Mestre</h3>
+      <p>
+        O Mestre ainda não ativou personagens para a sessão atual.
+        Assim que o narrador habilitar os heróis na ficha de controle, eles serão listados aqui automaticamente.
+      </p>
+    </div>
+
+  </main>
+
+  <!-- QUICK NAVIGATION BAR -->
+  <nav class="quick-nav-bar">
+    <a href="hub.html" class="quick-nav-btn">
+      <span>🏰</span> HUB Central
+    </a>
+    <a href="conteudos.html" class="quick-nav-btn">
+      <span>🖼️</span> Conteúdos da Sessão
+    </a>
+    <a href="registro-sessao.html" class="quick-nav-btn">
+      <span>📜</span> Registro de Sessão
+    </a>
+    <a href="personagens-sessao.html" class="quick-nav-btn active">
+      <span>⚔️</span> Personagens na Sessão
+    </a>
+  </nav>
+
+  <!-- AUTH JS SCRIPT -->
+  <script src="../assets/auth.js"></script>
+
+  <script>
+    // --- AUTH GUARD ---
+    function checkAuthSafeguard() {
+      if (typeof requireAuth === 'function') {
+        requireAuth();
+      }
+    }
+    checkAuthSafeguard();
+
+    // --- CHARACTERS DATA FETCHING ---
+    function getSessionCharacters() {
+      try {
+        const raw = localStorage.getItem('characters') || localStorage.getItem('personagens');
+        let allChars = raw ? JSON.parse(raw) : [];
+
+        // Filter by sessionActive: true
+        let sessionChars = allChars.filter(c => c.sessionActive === true || c.sessaoAtiva === true || c.ativo === true);
+
+        // If none is marked sessionActive yet, check if there are any characters at all
+        if (sessionChars.length === 0 && allChars.length > 0) {
+          // If master hasn't explicitly flagged sessionActive, check if any has sessionActive === undefined
+          // But as required: "Data from localStorage characters array filtered by sessionActive:true"
+          return sessionChars;
+        }
+
+        return sessionChars;
+      } catch (e) {
+        console.error('Erro ao ler personagens:', e);
+        return [];
+      }
+    }
+
+    function renderCharacters() {
+      let chars = getSessionCharacters();
+
+      // If localStorage is completely empty on fresh install, populate a default set with sessionActive: true so demo is rich
+      if (!localStorage.getItem('characters') && !localStorage.getItem('personagens')) {
+        const sampleChars = [
+          {
+            id: 1,
+            name: 'Valerius Corvo de Aço',
+            playerName: 'Carlos Arthur',
+            class: 'Paladino da Alvorada',
+            image: 'https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?w=600&auto=format&fit=crop&q=80',
+            hp: 48,
+            maxHp: 55,
+            mana: 20,
+            maxMana: 25,
+            sessionActive: true
+          },
+          {
+            id: 2,
+            name: 'Aeloria Ventossereno',
+            playerName: 'Mariana Lima',
+            class: 'Maga Evocadora',
+            image: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=600&auto=format&fit=crop&q=80',
+            hp: 28,
+            maxHp: 32,
+            mana: 45,
+            maxMana: 45,
+            sessionActive: true
+          },
+          {
+            id: 3,
+            name: 'Thorin Quebra-Escudo',
+            playerName: 'Rodrigo Gomes',
+            class: 'Guerreiro Berserker',
+            image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=600&auto=format&fit=crop&q=80',
+            hp: 64,
+            maxHp: 68,
+            mana: 10,
+            maxMana: 10,
+            sessionActive: true
+          },
+          {
+            id: 4,
+            name: 'Lyra das Sombras',
+            playerName: 'Fernanda Rocha',
+            class: 'Ladina Assassina',
+            image: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=600&auto=format&fit=crop&q=80',
+            hp: 36,
+            maxHp: 40,
+            mana: 15,
+            maxMana: 15,
+            sessionActive: true
+          }
+        ];
+        localStorage.setItem('characters', JSON.stringify(sampleChars));
+        chars = sampleChars;
+      }
+
+      const grid = document.getElementById('charactersGridContainer');
+      const emptyState = document.getElementById('emptyStateContainer');
+      const countBadge = document.getElementById('rosterCountBadge');
+
+      countBadge.textContent = `${chars.length} Personagens em Mesa`;
+
+      if (chars.length === 0) {
+        grid.style.display = 'none';
+        emptyState.style.display = 'flex';
+        return;
+      }
+
+      grid.style.display = 'grid';
+      emptyState.style.display = 'none';
+      grid.innerHTML = '';
+
+      chars.forEach(char => {
+        const name = char.name || char.nome || 'Herói Desconhecido';
+        const playerName = char.playerName || char.jogador || 'Jogador Anônimo';
+        const charClass = char.class || char.classe || 'Aventureiro';
+        const image = char.image || char.imagem || char.apresentacaoUrl || char.foto || 'https://images.unsplash.com/photo-1569003339405-ea396a5a8a90?w=600&auto=format&fit=crop&q=80';
+        
+        const currentHp = (char.hp !== undefined) ? char.hp : 30;
+        const maxHp = (char.maxHp !== undefined) ? char.maxHp : (char.hpMax || 30);
+        const hpPct = Math.max(0, Math.min(100, Math.round((currentHp / maxHp) * 100)));
+
+        const currentMana = (char.mana !== undefined) ? char.mana : 20;
+        const maxMana = (char.maxMana !== undefined) ? char.maxMana : (char.manaMax || 20);
+        const manaPct = Math.max(0, Math.min(100, Math.round((currentMana / maxMana) * 100)));
+
+        const card = document.createElement('div');
+        card.className = 'character-card';
+
+        card.innerHTML = `
+          <div class="char-image-wrapper">
+            <img src="${image}" alt="${name}" onerror="this.src='https://images.unsplash.com/photo-1569003339405-ea396a5a8a90?w=600&auto=format&fit=crop&q=80'">
+            <span class="char-class-badge">${charClass}</span>
+          </div>
+          <div class="char-card-body">
+            <div class="char-header-info">
+              <h3 class="char-name">${name}</h3>
+              <div class="player-name">
+                <span>👤</span> Jogador: <strong style="color:var(--text);">${playerName}</strong>
+              </div>
+            </div>
+
+            <div class="card-vitals">
+              <!-- HP -->
+              <div class="bar-line">
+                <div class="bar-info">
+                  <span style="color:#e74c3c;">❤️ Vida (HP)</span>
+                  <span style="color:var(--text);">${currentHp} / ${maxHp}</span>
+                </div>
+                <div class="stat-track">
+                  <div class="stat-fill hp" style="width: ${hpPct}%;"></div>
+                </div>
+              </div>
+
+              <!-- MANA -->
+              <div class="bar-line">
+                <div class="bar-info">
+                  <span style="color:#3498db;">✨ Mana (MP)</span>
+                  <span style="color:var(--text);">${currentMana} / ${maxMana}</span>
+                </div>
+                <div class="stat-track">
+                  <div class="stat-fill mana" style="width: ${manaPct}%;"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
+
+        grid.appendChild(card);
+      });
+    }
+
+    // Auto-update every 5s if master enables new characters or changes HP
+    renderCharacters();
+    setInterval(renderCharacters, 5000);
+  </script>
+</body>
+</html>

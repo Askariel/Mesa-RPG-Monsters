@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cenários - RPG Virtual</title>
+  <link rel="stylesheet" href="../assets/style.css">
+  <style>
+    .page-header-nav {
+      background: var(--bg-mid);
+      border-bottom: 2px solid var(--gold);
+      padding: 12px 24px;
+    }
+    .header-inner {
+      max-width: 1400px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    /* Category Navigation */
+    .cenarios-category-tabs {
+      display: flex;
+      gap: 12px;
+      margin: 20px 0;
+      flex-wrap: wrap;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 12px;
+    }
+    .cat-btn {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      color: var(--text-dim);
+      font-family: inherit;
+      font-weight: 700;
+      font-size: 0.95rem;
+      padding: 10px 22px;
+      border-radius: 6px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+    }
+    .cat-btn:hover {
+      color: var(--gold);
+      border-color: var(--gold-dark);
+      background: rgba(201, 162, 39, 0.05);
+    }
+    .cat-btn.active {
+      background: linear-gradient(135deg, rgba(201, 162, 39, 0.25), rgba(139, 105, 20, 0.15));
+      border-color: var(--gold);
+      color: var(--gold);
+      box-shadow: 0 0 10px rgba(201, 162, 39, 0.2);
+    }
+
+    /* Layout: Upload Form + Gallery Grid */
+    .cenarios-content-grid {
+      display: grid;
+      grid-template-columns: 320px 1fr;
+      gap: 24px;
+    }
+
+    @media (max-width: 900px) {
+      .cenarios-content-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .upload-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      height: fit-content;
+    }
+
+    .upload-card h3 {
+      color: var(--gold);
+      font-size: 1.1rem;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .form-group label {
+      font-size: 0.85rem;
+      color: var(--text-dim);
+    }
+    .form-group input[type="text"],
+    .form-group select {
+      background: var(--bg-dark);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 10px;
+      border-radius: 4px;
+      font-family: inherit;
+      font-size: 0.9rem;
+    }
+    .form-group input[type="file"] {
+      font-size: 0.85rem;
+      color: var(--text-dim);
+    }
+
+    /* Gallery Grid */
+    .gallery-container {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 18px;
+    }
+
+    .cenario-card {
+      background: var(--bg-mid);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      transition: transform 0.2s, border-color 0.2s;
+    }
+    .cenario-card:hover {
+      border-color: var(--gold);
+      transform: translateY(-2px);
+    }
+
+    .cenario-thumb {
+      width: 100%;
+      height: 160px;
+      object-fit: cover;
+      background: #000;
+      display: block;
+    }
+
+    .cenario-details {
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      flex-grow: 1;
+    }
+    .cenario-title {
+      font-weight: 700;
+      font-size: 0.95rem;
+      color: var(--text);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .cenario-date {
+      font-size: 0.75rem;
+      color: var(--text-dim);
+    }
+    .cenario-category-badge {
+      font-size: 0.7rem;
+      color: var(--gold);
+      text-transform: uppercase;
+      font-weight: bold;
+    }
+
+    .cenario-actions {
+      margin-top: 8px;
+      padding-top: 8px;
+      border-top: 1px solid rgba(255,255,255,0.06);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navigation Bar -->
+  <header class="page-header-nav">
+    <div class="header-inner">
+      <div style="display: flex; align-items: center; gap: 16px;">
+        <a href="../dashboard.html" class="btn-gold" style="padding: 6px 14px; font-size: 0.85rem;">
+          &larr; Voltar ao Painel
+        </a>
+        <h1 style="color: var(--gold); font-size: 1.3rem; letter-spacing: 1.5px; font-weight: 700;">
+          CENÁRIOS
+        </h1>
+      </div>
+      <div style="display: flex; align-items: center; gap: 14px;">
+        <span id="userDisplayName" style="font-size: 0.9rem; color: var(--text-dim);">Mestre: ...</span>
+        <button onclick="logout()" class="btn-red" style="padding: 6px 14px; font-size: 0.85rem;">Sair</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="page-wrapper">
+
+    <!-- Category Tabs -->
+    <div class="cenarios-category-tabs">
+      <button class="cat-btn active" id="catBtnMAPAS" onclick="setCategory('MAPAS')">
+        <span>&#128506;</span> MAPAS
+      </button>
+      <button class="cat-btn" id="catBtnPAISAGENS" onclick="setCategory('PAISAGENS')">
+        <span>&#127755;</span> PAISAGENS
+      </button>
+      <button class="cat-btn" id="catBtnINTERIORES" onclick="setCategory('INTERIORES')">
+        <span>&#127960;</span> INTERIORES
+      </button>
+      <button class="cat-btn" id="catBtnCONSTRUCOES" onclick="setCategory('CONSTRUÇÕES')">
+        <span>&#127984;</span> CONSTRUÇÕES
+      </button>
+    </div>
+
+    <!-- Main Content Area -->
+    <div class="cenarios-content-grid">
+      
+      <!-- Upload Section -->
+      <aside class="upload-card">
+        <h3><span>&#10010;</span> Cadastrar Imagem</h3>
+        <form id="uploadForm" onsubmit="handleImageUpload(event)">
+          <div class="form-group">
+            <label for="imageName">Nome do Cenário:</label>
+            <input type="text" id="imageName" placeholder="Ex: Fortaleza Submersa" required />
+          </div>
+
+          <div class="form-group" style="margin-top: 12px;">
+            <label for="imageCategory">Categoria:</label>
+            <select id="imageCategory" required>
+              <option value="MAPAS">MAPAS</option>
+              <option value="PAISAGENS">PAISAGENS</option>
+              <option value="INTERIORES">INTERIORES</option>
+              <option value="CONSTRUÇÕES">CONSTRUÇÕES</option>
+            </select>
+          </div>
+
+          <div class="form-group" style="margin-top: 12px;">
+            <label for="imageFile">Arquivo de Imagem:</label>
+            <input type="file" id="imageFile" accept="image/*" required />
+          </div>
+
+          <button type="submit" class="btn-gold" style="width: 100%; margin-top: 18px; padding: 10px;">
+            Cadastrar Imagem
+          </button>
+        </form>
+      </aside>
+
+      <!-- Gallery Grid -->
+      <section class="gallery-container">
+        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 10px;">
+          <h2 id="galleryHeading" style="color: var(--gold); font-size: 1.15rem;">
+            Galeria: MAPAS
+          </h2>
+          <span id="galleryCounter" style="color: var(--text-dim); font-size: 0.85rem;">0 cenários cadastrados</span>
+        </div>
+
+        <div class="gallery-grid" id="cenariosGalleryGrid">
+          <!-- Populated dynamically -->
+        </div>
+      </section>
+
+    </div>
+
+  </main>
+
+  <script src="../assets/auth.js"></script>
+  <script>
+    // 1. Auth Guard
+    const currentUser = requireMestre();
+    if (currentUser) {
+      document.getElementById('userDisplayName').textContent = `Mestre: ${currentUser.nome || currentUser.login}`;
+    }
+
+    const CENARIOS_KEY = 'cenarios';
+    let currentActiveCategory = 'MAPAS';
+
+    // 2. Ensure initial scenarios
+    function seedDefaultCenarios() {
+      if (!localStorage.getItem(CENARIOS_KEY)) {
+        const defaults = [
+          {
+            id: 'cen_1',
+            name: 'Cripta dos Antigos',
+            category: 'MAPAS',
+            data: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=800&auto=format&fit=crop&q=80',
+            dateAdded: new Date().toISOString()
+          },
+          {
+            id: 'cen_2',
+            name: 'Pico Glacial do Wyrm',
+            category: 'PAISAGENS',
+            data: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=800&auto=format&fit=crop&q=80',
+            dateAdded: new Date().toISOString()
+          },
+          {
+            id: 'cen_3',
+            name: 'Salão de Banquete Real',
+            category: 'INTERIORES',
+            data: 'https://images.unsplash.com/photo-1572025442646-866d16c84a54?w=800&auto=format&fit=crop&q=80',
+            dateAdded: new Date().toISOString()
+          },
+          {
+            id: 'cen_4',
+            name: 'Cidadela de Pedra Negra',
+            category: 'CONSTRUÇÕES',
+            data: 'https://images.unsplash.com/photo-1514539079130-25950c84af65?w=800&auto=format&fit=crop&q=80',
+            dateAdded: new Date().toISOString()
+          }
+        ];
+        localStorage.setItem(CENARIOS_KEY, JSON.stringify(defaults));
+      }
+    }
+
+    // 3. Category Switching
+    function setCategory(category) {
+      currentActiveCategory = category;
+
+      // Update Tab Styles
+      const catMap = {
+        'MAPAS': 'catBtnMAPAS',
+        'PAISAGENS': 'catBtnPAISAGENS',
+        'INTERIORES': 'catBtnINTERIORES',
+        'CONSTRUÇÕES': 'catBtnCONSTRUCOES'
+      };
+
+      Object.keys(catMap).forEach(cat => {
+        const btn = document.getElementById(catMap[cat]);
+        if (btn) btn.classList.toggle('active', cat === category);
+      });
+
+      // Update upload selector to match active tab
+      const catSelect = document.getElementById('imageCategory');
+      if (catSelect) catSelect.value = category;
+
+      renderGallery(category);
+    }
+
+    // 4. Render Gallery
+    function renderGallery(category) {
+      const grid = document.getElementById('cenariosGalleryGrid');
+      const heading = document.getElementById('galleryHeading');
+      const counter = document.getElementById('galleryCounter');
+
+      heading.textContent = `Galeria: ${category}`;
+
+      let allCenarios = [];
+      try {
+        allCenarios = JSON.parse(localStorage.getItem(CENARIOS_KEY)) || [];
+      } catch (e) {
+        allCenarios = [];
+      }
+
+      const filtered = allCenarios.filter(c => (c.category || 'MAPAS').toUpperCase() === category.toUpperCase());
+      counter.textContent = `${filtered.length} ${filtered.length === 1 ? 'cenário cadastrado' : 'cenários cadastrados'}`;
+
+      grid.innerHTML = '';
+      if (filtered.length === 0) {
+        grid.innerHTML = `
+          <div style="grid-column: 1/-1; text-align: center; color: var(--text-dim); padding: 40px; font-style: italic;">
+            Nenhum cenário cadastrado na categoria ${category}. Cadastre uma imagem pelo formulário à esquerda.
+          </div>
+        `;
+        return;
+      }
+
+      filtered.forEach(item => {
+        const card = document.createElement('div');
+        card.className = 'cenario-card';
+
+        const dateStr = item.dateAdded ? new Date(item.dateAdded).toLocaleDateString('pt-BR') : 'Data n/d';
+
+        card.innerHTML = `
+          <img src="${item.data}" alt="${item.name}" class="cenario-thumb" loading="lazy" />
+          <div class="cenario-details">
+            <div class="cenario-category-badge">${item.category || category}</div>
+            <div class="cenario-title" title="${item.name}">${item.name}</div>
+            <div class="cenario-date">Adicionado em: ${dateStr}</div>
+            <div class="cenario-actions">
+              <button onclick="deleteImage('${item.id}')" class="btn-red" style="padding: 4px 10px; font-size: 0.75rem;">
+                &#128465; Excluir
+              </button>
+            </div>
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+    }
+
+    // 5. Upload Image Function
+    function handleImageUpload(e) {
+      e.preventDefault();
+      uploadImage();
+    }
+
+    function uploadImage() {
+      const nameInput = document.getElementById('imageName');
+      const catInput = document.getElementById('imageCategory');
+      const fileInput = document.getElementById('imageFile');
+
+      const name = nameInput.value.trim();
+      const category = catInput.value;
+      const file = fileInput.files[0];
+
+      if (!name) {
+        alert('Informe um nome para a imagem.');
+        return;
+      }
+      if (!file) {
+        alert('Selecione um arquivo de imagem.');
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = function(evt) {
+        const base64Data = evt.target.result;
+
+        let cenarios = [];
+        try {
+          cenarios = JSON.parse(localStorage.getItem(CENARIOS_KEY)) || [];
+        } catch (e) {
+          cenarios = [];
+        }
+
+        const newCenario = {
+          id: 'cen_' + Date.now(),
+          name: name,
+          category: category,
+          data: base64Data,
+          dateAdded: new Date().toISOString()
+        };
+
+        cenarios.unshift(newCenario);
+        localStorage.setItem(CENARIOS_KEY, JSON.stringify(cenarios));
+
+        // Reset form
+        nameInput.value = '';
+        fileInput.value = '';
+
+        // Switch to the uploaded category if different
+        setCategory(category);
+      };
+
+      reader.readAsDataURL(file);
+    }
+
+    // 6. Delete Image Function
+    function deleteImage(id) {
+      if (!confirm('Deseja realmente remover esta imagem da galeria?')) return;
+
+      let cenarios = [];
+      try {
+        cenarios = JSON.parse(localStorage.getItem(CENARIOS_KEY)) || [];
+      } catch (e) {
+        cenarios = [];
+      }
+
+      cenarios = cenarios.filter(item => item.id !== id);
+      localStorage.setItem(CENARIOS_KEY, JSON.stringify(cenarios));
+
+      renderGallery(currentActiveCategory);
+    }
+
+    // Initialize Page
+    document.addEventListener('DOMContentLoaded', () => {
+      seedDefaultCenarios();
+      setCategory('MAPAS');
+    });
+  </script>
+</body>
+</html>

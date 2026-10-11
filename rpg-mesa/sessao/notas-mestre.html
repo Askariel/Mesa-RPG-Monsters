@@ -1,0 +1,831 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NOTAS DO MESTRE | RPG de Mesa</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=MedievalSharp&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/style.css">
+  <style>
+    :root {
+      --bg-dark: #0d0d1a;
+      --bg-mid: #1a1a2e;
+      --bg-card: #16213e;
+      --gold: #c9a227;
+      --gold-bright: #ffd700;
+      --red: #8b0000;
+      --red-bright: #c0392b;
+      --text: #e8d5b7;
+      --text-dim: #a89070;
+      --border: #2a2a4a;
+      --border-gold: #c9a22744;
+      --font-rpg: 'Cinzel', serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      color: var(--text);
+      font-family: var(--font-rpg);
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      background-image: 
+        radial-gradient(circle at 50% 20%, rgba(26, 26, 46, 0.8) 0%, rgba(13, 13, 26, 0.98) 80%),
+        repeating-linear-gradient(0deg, rgba(201, 162, 39, 0.015) 0px, rgba(201, 162, 39, 0.015) 1px, transparent 1px, transparent 30px);
+    }
+
+    /* TOP NAVBAR */
+    .rpg-navbar {
+      background: linear-gradient(180deg, #18182c 0%, #101020 100%);
+      border-bottom: 2px solid var(--gold);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.7);
+      padding: 10px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      z-index: 100;
+      flex-shrink: 0;
+    }
+
+    .nav-left {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .btn-nav-back {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px;
+      background: rgba(22, 33, 62, 0.8);
+      color: var(--gold);
+      border: 1px solid var(--gold);
+      border-radius: 4px;
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 600;
+      letter-spacing: 1px;
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+
+    .btn-nav-back:hover {
+      background: var(--gold);
+      color: #0d0d1a;
+      box-shadow: 0 0 12px rgba(201, 162, 39, 0.5);
+    }
+
+    .nav-title {
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: var(--gold);
+      letter-spacing: 2px;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8), 0 0 10px rgba(201, 162, 39, 0.4);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .mestre-badge {
+      background: var(--red);
+      color: #fff;
+      font-size: 0.7rem;
+      padding: 2px 8px;
+      border-radius: 3px;
+      border: 1px solid #ff4444;
+      letter-spacing: 1px;
+    }
+
+    /* TOOLBAR */
+    .master-toolbar {
+      background: #111526;
+      border-bottom: 1px solid var(--border-gold);
+      padding: 8px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      flex-shrink: 0;
+    }
+
+    .toolbar-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .btn-tool {
+      background: #19223c;
+      color: var(--text);
+      border: 1px solid var(--border);
+      padding: 6px 14px;
+      border-radius: 4px;
+      font-family: var(--font-rpg);
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+    }
+
+    .btn-tool:hover {
+      border-color: var(--gold);
+      color: var(--gold);
+      background: rgba(201, 162, 39, 0.15);
+    }
+
+    .btn-tool.primary {
+      background: linear-gradient(135deg, rgba(201, 162, 39, 0.25) 0%, rgba(22, 33, 62, 0.9) 100%);
+      border-color: var(--gold);
+      color: var(--gold-bright);
+    }
+
+    .btn-tool.danger {
+      border-color: #8b0000;
+      color: #ff6b6b;
+    }
+    .btn-tool.danger:hover {
+      background: rgba(139, 0, 0, 0.3);
+    }
+
+    .auto-save-indicator {
+      font-size: 0.8rem;
+      color: var(--text-dim);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .save-dot {
+      width: 8px;
+      height: 8px;
+      background: #27ae60;
+      border-radius: 50%;
+    }
+
+    /* SPLIT MAIN LAYOUT */
+    .split-layout-container {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      padding: 14px;
+      height: calc(100vh - 120px);
+      overflow: hidden;
+    }
+
+    @media (max-width: 900px) {
+      .split-layout-container {
+        grid-template-columns: 1fr;
+        grid-template-rows: 1fr 1fr;
+        height: auto;
+        overflow-y: auto;
+      }
+    }
+
+    /* PANELS */
+    .split-panel {
+      background: rgba(22, 33, 62, 0.85);
+      border: 1px solid var(--border);
+      border-top: 2px solid var(--gold);
+      border-radius: 6px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .split-panel-header {
+      background: linear-gradient(180deg, rgba(201, 162, 39, 0.15) 0%, rgba(22, 33, 62, 0.95) 100%);
+      padding: 10px 16px;
+      border-bottom: 1px solid var(--border-gold);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-shrink: 0;
+    }
+
+    .split-panel-header h3 {
+      font-size: 1rem;
+      color: var(--gold);
+      letter-spacing: 1.5px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 0;
+    }
+
+    .panel-instruction-hint {
+      font-size: 0.72rem;
+      color: var(--text-dim);
+    }
+
+    /* CANVAS MIND MAP */
+    .canvas-wrapper {
+      flex: 1;
+      position: relative;
+      background: #080b14;
+      overflow: hidden;
+      cursor: crosshair;
+    }
+
+    #mindMapCanvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    .canvas-overlay-tip {
+      position: absolute;
+      bottom: 10px;
+      left: 10px;
+      background: rgba(13, 13, 26, 0.85);
+      border: 1px solid var(--border);
+      padding: 6px 12px;
+      border-radius: 4px;
+      font-size: 0.72rem;
+      color: var(--text-dim);
+      pointer-events: none;
+    }
+
+    /* NOTEPAD */
+    .notepad-wrapper {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      padding: 14px;
+      background: #0d111d;
+    }
+
+    .notepad-textarea {
+      flex: 1;
+      width: 100%;
+      background: #090d18;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      color: var(--text);
+      font-family: var(--font-rpg);
+      font-size: 0.95rem;
+      line-height: 1.6;
+      padding: 16px;
+      resize: none;
+      outline: none;
+      box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.8);
+    }
+
+    .notepad-textarea:focus {
+      border-color: var(--gold);
+      box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.8), 0 0 10px rgba(201, 162, 39, 0.2);
+    }
+
+    /* QUICK NAVIGATION BAR */
+    .quick-nav-bar {
+      background: #101322;
+      border-top: 1px solid var(--border-gold);
+      padding: 8px 16px;
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      flex-wrap: wrap;
+      flex-shrink: 0;
+    }
+
+    .quick-nav-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(22, 33, 62, 0.9);
+      color: var(--text);
+      border: 1px solid var(--border);
+      padding: 6px 16px;
+      border-radius: 4px;
+      text-decoration: none;
+      font-size: 0.82rem;
+      font-weight: 600;
+      letter-spacing: 1px;
+      transition: all 0.2s ease;
+    }
+
+    .quick-nav-btn:hover {
+      border-color: var(--gold);
+      color: var(--gold);
+      background: rgba(201, 162, 39, 0.1);
+      box-shadow: 0 0 10px rgba(201, 162, 39, 0.25);
+    }
+
+    .quick-nav-btn.active {
+      background: var(--gold);
+      color: #0d0d1a;
+      border-color: #ffd700;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- TOP NAVBAR -->
+  <header class="rpg-navbar">
+    <div class="nav-left">
+      <a href="../dashboard.html" class="btn-nav-back" title="Voltar ao Painel">
+        <span>&larr;</span> Painel
+      </a>
+      <a href="hub.html" class="btn-nav-back" style="border-color:var(--border);" title="Ir para a Mesa">
+        <span>🏰</span> Hub da Mesa
+      </a>
+      <div class="nav-title">
+        <span>📖</span> NOTAS DO MESTRE
+        <span class="mestre-badge">EXCLUSIVO MESTRE</span>
+      </div>
+    </div>
+    <div class="auto-save-indicator">
+      <span class="save-dot"></span>
+      <span id="saveStatusText">Salvo automaticamente</span>
+    </div>
+  </header>
+
+  <!-- TOOLBAR -->
+  <div class="master-toolbar">
+    <div class="toolbar-group">
+      <button class="btn-tool primary" onclick="promptAddChildNode()">
+        <span>➕</span> Adicionar Nó Filho
+      </button>
+      <button class="btn-tool" onclick="promptAddNewNodeFree()">
+        <span>📍</span> Novo Nó Livre
+      </button>
+      <button class="btn-tool danger" onclick="clearMindMapCanvas()">
+        <span>🗑️</span> Limpar Mapa
+      </button>
+    </div>
+
+    <div class="toolbar-group">
+      <button class="btn-tool" onclick="saveAllNotesNow()">
+        <span>💾</span> Salvar Notas
+      </button>
+      <button class="btn-tool primary" onclick="exportNotesTxt()">
+        <span>📥</span> Exportar .TXT
+      </button>
+    </div>
+  </div>
+
+  <!-- SPLIT MAIN CONTAINER -->
+  <main class="split-layout-container">
+
+    <!-- LEFT PANEL: CANVAS MIND MAP -->
+    <section class="split-panel">
+      <div class="split-panel-header">
+        <h3><span>🕸️</span> MAPA MENTAL DA CAMPANHA</h3>
+        <span class="panel-instruction-hint">Clique para selecionar/arrastar &bull; Botão direito remove nó</span>
+      </div>
+      <div class="canvas-wrapper" id="canvasWrapper">
+        <canvas id="mindMapCanvas"></canvas>
+        <div class="canvas-overlay-tip">
+          💡 Dica: Clique em um nó para selecioná-lo e use "Adicionar Nó Filho" para ramificar a história.
+        </div>
+      </div>
+    </section>
+
+    <!-- RIGHT PANEL: NOTEPAD TEXTAREA -->
+    <section class="split-panel">
+      <div class="split-panel-header">
+        <h3><span>📝</span> DIÁRIO DE ANOTAÇÕES SECRETAS</h3>
+        <span class="panel-instruction-hint" id="notepadWordCount">0 palavras</span>
+      </div>
+      <div class="notepad-wrapper">
+        <textarea id="masterNotepad" class="notepad-textarea" placeholder="Escreva aqui segredos da trama, pistas, estatísticas de monstros ocultos, diálogos de NPCs e reviravoltas..."></textarea>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- QUICK NAVIGATION BAR -->
+  <nav class="quick-nav-bar">
+    <a href="hub.html" class="quick-nav-btn">
+      <span>🏰</span> HUB Central
+    </a>
+    <a href="conteudos.html" class="quick-nav-btn">
+      <span>🖼️</span> Conteúdos da Sessão
+    </a>
+    <a href="registro-sessao.html" class="quick-nav-btn">
+      <span>📜</span> Registro de Sessão
+    </a>
+    <a href="personagens-sessao.html" class="quick-nav-btn">
+      <span>⚔️</span> Personagens na Sessão
+    </a>
+    <a href="notas-mestre.html" class="quick-nav-btn active">
+      <span>📖</span> Notas do Mestre
+    </a>
+  </nav>
+
+  <!-- AUTH JS SCRIPT -->
+  <script src="../assets/auth.js"></script>
+
+  <script>
+    // --- AUTH GUARD & REQUIRE MESTRE ---
+    function checkMestreAuthSafeguard() {
+      if (typeof requireMestre === 'function') {
+        requireMestre();
+      } else if (typeof requireAuth === 'function') {
+        requireAuth();
+      } else {
+        // Fallback check
+        try {
+          const userStr = localStorage.getItem('currentUser') || localStorage.getItem('usuarioLogado');
+          if (userStr && userStr.startsWith('{')) {
+            const user = JSON.parse(userStr);
+            if (user.role && user.role.toLowerCase() !== 'mestre' && user.role.toLowerCase() !== 'admin') {
+              console.warn('Aviso: Perfil não marcado como mestre.');
+            }
+          }
+        } catch (e) {}
+      }
+    }
+    checkMestreAuthSafeguard();
+
+    // ==========================================
+    // MIND MAP CANVAS IMPLEMENTATION
+    // ==========================================
+    const canvas = document.getElementById('mindMapCanvas');
+    const ctx = canvas.getContext('2d');
+    const canvasWrapper = document.getElementById('canvasWrapper');
+
+    let nodes = [];
+    let selectedNodeId = null;
+    let draggingNode = null;
+    let dragOffsetX = 0;
+    let dragOffsetY = 0;
+
+    function resizeCanvas() {
+      const rect = canvasWrapper.getBoundingClientRect();
+      canvas.width = rect.width;
+      canvas.height = rect.height;
+      drawCanvas();
+    }
+    window.addEventListener('resize', resizeCanvas);
+
+    // Initial default tree
+    function initDefaultMindMap() {
+      const rect = canvasWrapper.getBoundingClientRect();
+      const cx = (rect.width > 0) ? rect.width / 2 : 300;
+      const cy = (rect.height > 0) ? rect.height / 2 : 250;
+
+      return [
+        { id: 1, text: 'Campanha', x: cx, y: cy, parentId: null, isRoot: true },
+        { id: 2, text: 'Cripta Esquecida', x: cx - 140, y: cy - 90, parentId: 1, isRoot: false },
+        { id: 3, text: 'Culto do Vazio', x: cx + 140, y: cy - 90, parentId: 1, isRoot: false },
+        { id: 4, text: 'Relíquia Antiga', x: cx, y: cy + 120, parentId: 1, isRoot: false }
+      ];
+    }
+
+    function loadMindMapData() {
+      try {
+        const raw = localStorage.getItem('mindMapData');
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            return parsed;
+          }
+        }
+      } catch (e) {
+        console.error('Erro ao ler mindMapData:', e);
+      }
+      return initDefaultMindMap();
+    }
+
+    function saveMindMapData() {
+      try {
+        localStorage.setItem('mindMapData', JSON.stringify(nodes));
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    function addNode(text, x, y, parentId) {
+      const newId = Date.now();
+      const node = {
+        id: newId,
+        text: text || 'Novo Ponto',
+        x: x,
+        y: y,
+        parentId: parentId || null,
+        isRoot: false
+      };
+      nodes.push(node);
+      selectedNodeId = newId;
+      saveMindMapData();
+      drawCanvas();
+      return node;
+    }
+
+    function promptAddChildNode() {
+      let parentNode = nodes.find(n => n.id === selectedNodeId);
+      if (!parentNode) {
+        parentNode = nodes.find(n => n.isRoot) || nodes[0];
+      }
+
+      const name = prompt(`Digite o nome do nó conectado a "${parentNode ? parentNode.text : 'Raiz'}":`);
+      if (!name || !name.trim()) return;
+
+      // Position radially or offset from parent
+      const angle = Math.random() * Math.PI * 2;
+      const dist = 110 + Math.random() * 40;
+      const nx = Math.max(70, Math.min(canvas.width - 70, (parentNode ? parentNode.x : canvas.width / 2) + Math.cos(angle) * dist));
+      const ny = Math.max(50, Math.min(canvas.height - 50, (parentNode ? parentNode.y : canvas.height / 2) + Math.sin(angle) * dist));
+
+      addNode(name.trim(), nx, ny, parentNode ? parentNode.id : null);
+    }
+
+    function promptAddNewNodeFree() {
+      const name = prompt('Digite o nome do novo nó:');
+      if (!name || !name.trim()) return;
+      const nx = canvas.width / 2 + (Math.random() - 0.5) * 160;
+      const ny = canvas.height / 2 + (Math.random() - 0.5) * 160;
+      addNode(name.trim(), nx, ny, null);
+    }
+
+    function clearMindMapCanvas() {
+      if (confirm('Deseja resetar o mapa mental para o nó central "Campanha"?')) {
+        const rect = canvasWrapper.getBoundingClientRect();
+        nodes = [
+          { id: 1, text: 'Campanha', x: rect.width / 2, y: rect.height / 2, parentId: null, isRoot: true }
+        ];
+        selectedNodeId = 1;
+        saveMindMapData();
+        drawCanvas();
+      }
+    }
+
+    // DRAWING
+    function drawConnections() {
+      ctx.lineWidth = 2;
+      nodes.forEach(node => {
+        if (node.parentId) {
+          const parent = nodes.find(n => n.id === node.parentId);
+          if (parent) {
+            ctx.beginPath();
+            ctx.strokeStyle = (selectedNodeId === node.id || selectedNodeId === parent.id) ? '#ffd700' : 'rgba(201, 162, 39, 0.45)';
+            ctx.setLineDash([4, 4]);
+
+            // Draw curved bezier line between nodes
+            const midX = (parent.x + node.x) / 2;
+            const midY = (parent.y + node.y) / 2 - 15;
+            ctx.moveTo(parent.x, parent.y);
+            ctx.quadraticCurveTo(midX, midY, node.x, node.y);
+            ctx.stroke();
+            ctx.setLineDash([]);
+          }
+        }
+      });
+    }
+
+    function drawNode(node) {
+      const isSelected = (node.id === selectedNodeId);
+      const isRoot = node.isRoot;
+
+      ctx.save();
+      ctx.font = isRoot ? 'bold 14px Cinzel, serif' : '12px Cinzel, serif';
+      const textMetrics = ctx.measureText(node.text);
+      const textWidth = textMetrics.width;
+      const padX = 16;
+      const padY = 10;
+      const boxW = Math.max(90, textWidth + padX * 2);
+      const boxH = 34;
+      const rx = node.x - boxW / 2;
+      const ry = node.y - boxH / 2;
+
+      // Glow if selected
+      if (isSelected) {
+        ctx.shadowColor = '#ffd700';
+        ctx.shadowBlur = 15;
+      } else {
+        ctx.shadowColor = 'rgba(0, 0, 0, 0.8)';
+        ctx.shadowBlur = 8;
+      }
+
+      // Background
+      ctx.fillStyle = isRoot ? 'rgba(139, 0, 0, 0.85)' : (isSelected ? 'rgba(27, 77, 137, 0.9)' : 'rgba(22, 33, 62, 0.9)');
+      ctx.strokeStyle = isSelected ? '#ffd700' : (isRoot ? '#c9a227' : '#2a2a4a');
+      ctx.lineWidth = isSelected ? 2 : 1.5;
+
+      // Rounded rectangle
+      ctx.beginPath();
+      ctx.roundRect(rx, ry, boxW, boxH, 6);
+      ctx.fill();
+      ctx.stroke();
+
+      // Text
+      ctx.shadowBlur = 0;
+      ctx.fillStyle = isSelected ? '#ffffff' : (isRoot ? '#ffd700' : '#e8d5b7');
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(node.text, node.x, node.y);
+
+      // Save dimensions for hit test
+      node.boxW = boxW;
+      node.boxH = boxH;
+      ctx.restore();
+    }
+
+    function drawCanvas() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Draw subtle grid
+      ctx.strokeStyle = 'rgba(201, 162, 39, 0.05)';
+      ctx.lineWidth = 1;
+      const gridSize = 40;
+      for (let x = 0; x < canvas.width; x += gridSize) {
+        ctx.beginPath();
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x, canvas.height);
+        ctx.stroke();
+      }
+      for (let y = 0; y < canvas.height; y += gridSize) {
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.lineTo(canvas.width, y);
+        ctx.stroke();
+      }
+
+      drawConnections();
+      nodes.forEach(drawNode);
+    }
+
+    function getNodeAt(x, y) {
+      for (let i = nodes.length - 1; i >= 0; i--) {
+        const n = nodes[i];
+        const bw = n.boxW || 90;
+        const bh = n.boxH || 34;
+        if (x >= n.x - bw / 2 && x <= n.x + bw / 2 && y >= n.y - bh / 2 && y <= n.y + bh / 2) {
+          return n;
+        }
+      }
+      return null;
+    }
+
+    // MOUSE EVENTS FOR CANVAS
+    canvas.addEventListener('mousedown', (e) => {
+      const rect = canvas.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+
+      if (e.button === 0) { // Left click
+        const clickedNode = getNodeAt(x, y);
+        if (clickedNode) {
+          selectedNodeId = clickedNode.id;
+          draggingNode = clickedNode;
+          dragOffsetX = x - clickedNode.x;
+          dragOffsetY = y - clickedNode.y;
+        } else {
+          selectedNodeId = null;
+        }
+        drawCanvas();
+      }
+    });
+
+    canvas.addEventListener('mousemove', (e) => {
+      if (draggingNode) {
+        const rect = canvas.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        draggingNode.x = Math.max(50, Math.min(canvas.width - 50, x - dragOffsetX));
+        draggingNode.y = Math.max(30, Math.min(canvas.height - 30, y - dragOffsetY));
+        drawCanvas();
+      }
+    });
+
+    window.addEventListener('mouseup', () => {
+      if (draggingNode) {
+        draggingNode = null;
+        saveMindMapData();
+      }
+    });
+
+    // Right-click to delete node
+    canvas.addEventListener('contextmenu', (e) => {
+      e.preventDefault();
+      const rect = canvas.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      const targetNode = getNodeAt(x, y);
+
+      if (targetNode) {
+        if (targetNode.isRoot) {
+          alert('O nó central de Campanha não pode ser excluído.');
+          return;
+        }
+        if (confirm(`Excluir nó "${targetNode.text}"?`)) {
+          // Reassign child nodes to root or parent
+          nodes.forEach(n => {
+            if (n.parentId === targetNode.id) {
+              n.parentId = targetNode.parentId || 1;
+            }
+          });
+          nodes = nodes.filter(n => n.id !== targetNode.id);
+          if (selectedNodeId === targetNode.id) selectedNodeId = null;
+          saveMindMapData();
+          drawCanvas();
+        }
+      }
+    });
+
+    // ==========================================
+    // NOTEPAD & AUTO-SAVE IMPLEMENTATION
+    // ==========================================
+    const notepad = document.getElementById('masterNotepad');
+    const saveStatusText = document.getElementById('saveStatusText');
+    const wordCountLabel = document.getElementById('notepadWordCount');
+
+    function updateWordCount(text) {
+      const words = text.trim() ? text.trim().split(/\s+/).length : 0;
+      wordCountLabel.textContent = `${words} palavras`;
+    }
+
+    function loadNotes() {
+      const savedNotes = localStorage.getItem('masterNotes') || localStorage.getItem('notasMestre');
+      if (savedNotes !== null) {
+        notepad.value = savedNotes;
+      } else {
+        notepad.value = `### NOTAS DA SESSÃO\n\n- O Culto do Vazio escondeu a relíquia no altar inferior da Cripta.\n- Chefe Orc possui 65 HP e ataque duplo.\n- Revelação: O taverneiro é secretamente o mensageiro da coroa!`;
+      }
+      updateWordCount(notepad.value);
+    }
+
+    function saveNotesToStorage() {
+      const text = notepad.value;
+      localStorage.setItem('masterNotes', text);
+      const now = new Date();
+      const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+      saveStatusText.textContent = `Salvo às ${timeStr}`;
+      updateWordCount(text);
+    }
+
+    function saveAllNotesNow() {
+      saveNotesToStorage();
+      saveMindMapData();
+      alert('Notas e Mapa Mental salvos com sucesso!');
+    }
+
+    // Auto-save every 2 seconds
+    setInterval(saveNotesToStorage, 2000);
+
+    // ==========================================
+    // EXPORT TO .TXT
+    // ==========================================
+    function exportNotesTxt() {
+      saveNotesToStorage();
+      saveMindMapData();
+
+      const mindMapSummary = nodes.map(n => {
+        const parent = nodes.find(p => p.id === n.parentId);
+        const rel = parent ? ` (Filho de: ${parent.text})` : ' [Nó Raiz / Livre]';
+        return `- ${n.text}${rel}`;
+      }).join('\n');
+
+      const fullContent = `========================================
+NOTAS DO MESTRE - RPG DE MESA
+Data de Exportação: ${new Date().toLocaleString()}
+========================================
+
+--- MAPA MENTAL DA CAMPANHA ---
+${mindMapSummary}
+
+--- DIÁRIO E NOTAS SECRETAS ---
+${notepad.value}
+
+========================================
+Fim do arquivo.
+`;
+
+      const blob = new Blob([fullContent], { type: 'text/plain;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `notas_mestre_${Date.now()}.txt`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+
+    // INIT
+    setTimeout(() => {
+      nodes = loadMindMapData();
+      resizeCanvas();
+      loadNotes();
+    }, 50);
+  </script>
+</body>
+</html>

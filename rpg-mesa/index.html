@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MESA RPG - Entrar</title>
+  <link rel="stylesheet" href="assets/style.css">
+  <style>
+    .login-container {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .login-card {
+      width: 100%;
+      max-width: 440px;
+      background: var(--bg-card);
+      border: 2px solid var(--gold);
+      border-radius: 12px;
+      padding: 40px 32px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8), 0 0 20px rgba(201, 162, 39, 0.2);
+      text-align: center;
+      position: relative;
+    }
+    .login-card::before {
+      content: '';
+      position: absolute;
+      top: -2px; left: -2px; right: -2px; bottom: -2px;
+      border: 1px solid rgba(201, 162, 39, 0.4);
+      border-radius: 14px;
+      pointer-events: none;
+    }
+    .crest-icon {
+      width: 80px;
+      height: 80px;
+      margin: 0 auto 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .crest-icon svg {
+      width: 100%;
+      height: 100%;
+      filter: drop-shadow(0 0 8px rgba(201, 162, 39, 0.5));
+    }
+    .login-subtitle {
+      color: var(--text-dim);
+      font-size: 0.95rem;
+      margin-bottom: 24px;
+      letter-spacing: 1px;
+    }
+    .alert-error {
+      background: rgba(139, 0, 0, 0.3);
+      border: 1px solid var(--red-light);
+      color: #ff9999;
+      padding: 10px;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      margin-bottom: 16px;
+      display: none;
+    }
+    .quick-creds {
+      margin-top: 24px;
+      padding-top: 16px;
+      border-top: 1px dashed var(--border);
+      font-size: 0.8rem;
+      color: var(--text-dim);
+      text-align: left;
+    }
+    .quick-creds code {
+      color: var(--gold);
+      background: var(--bg-dark);
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body>
+  <div class="login-container">
+    <div class="login-card">
+      <div class="crest-icon">
+        <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <!-- Shield Outer -->
+          <path d="M50 8 L88 22 C88 56 50 88 50 88 C50 88 12 56 12 22 Z" fill="#1a1a2e" stroke="#c9a227" stroke-width="3" stroke-linejoin="round"/>
+          <!-- Inner Ring / Detail -->
+          <path d="M50 16 L80 28 C80 54 50 80 50 80 C50 80 20 54 20 28 Z" fill="#0d0d1a" stroke="#8b6914" stroke-width="1.5"/>
+          <!-- D20 Icon inside Shield -->
+          <polygon points="50,30 68,42 68,64 50,76 32,64 32,42" stroke="#c9a227" stroke-width="2" fill="none"/>
+          <line x1="50" y1="30" x2="50" y2="76" stroke="#c9a227" stroke-width="1.5"/>
+          <line x1="32" y1="42" x2="68" y2="64" stroke="#c9a227" stroke-width="1.5"/>
+          <line x1="32" y1="64" x2="68" y2="42" stroke="#c9a227" stroke-width="1.5"/>
+          <circle cx="50" cy="53" r="3" fill="#c9a227"/>
+        </svg>
+      </div>
+
+      <h1>MESA RPG</h1>
+      <p class="login-subtitle">Sistema de Jogo de Mesa Digital</p>
+
+      <div id="errorMsg" class="alert-error">
+        Credenciais inválidas. Verifique seu login e senha.
+      </div>
+
+      <form id="loginForm">
+        <div class="form-group" style="text-align: left;">
+          <label for="loginUser">USUÁRIO / LOGIN</label>
+          <input type="text" id="loginUser" required placeholder="Ex: mestre ou jogador" autocomplete="username">
+        </div>
+
+        <div class="form-group" style="text-align: left;">
+          <label for="loginPass">SENHA SECRETA</label>
+          <input type="password" id="loginPass" required placeholder="••••••••" autocomplete="current-password">
+        </div>
+
+        <button type="submit" class="btn-gold" style="width: 100%; margin-top: 10px; font-size: 1rem; padding: 12px;">
+          ENTRAR NO REINO
+        </button>
+      </form>
+
+      <div class="quick-creds">
+        <div>👑 <strong>Mestre:</strong> <code>mestre</code> / <code>mestre123</code></div>
+        <div style="margin-top: 4px;">⚔️ <strong>Jogador:</strong> <code>jogador</code> / <code>jogador123</code></div>
+      </div>
+    </div>
+  </div>
+
+  <script src="assets/auth.js"></script>
+  <script>
+    // Auto redirect if already logged in
+    const current = getCurrentUser();
+    if (current) {
+      window.location.href = 'dashboard.html';
+    }
+
+    const loginForm = document.getElementById('loginForm');
+    const errorMsg = document.getElementById('errorMsg');
+
+    loginForm.addEventListener('submit', function(e) {
+      e.preventDefault();
+      errorMsg.style.display = 'none';
+
+      const username = document.getElementById('loginUser').value.trim();
+      const password = document.getElementById('loginPass').value;
+
+      const users = getUsers();
+      const matched = users.find(u => u.login === username && u.pass === password);
+
+      if (matched) {
+        sessionStorage.setItem('currentUser', JSON.stringify({
+          id: matched.id,
+          login: matched.login,
+          perfil: matched.perfil,
+          nome: matched.nome
+        }));
+        window.location.href = 'dashboard.html';
+      } else {
+        errorMsg.style.display = 'block';
+      }
+    });
+  </script>
+</body>
+</html>

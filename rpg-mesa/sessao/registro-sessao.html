@@ -1,0 +1,881 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>REGISTRO DE SESSÃO | RPG de Mesa</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=MedievalSharp&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/style.css">
+  <style>
+    :root {
+      --bg-dark: #0d0d1a;
+      --bg-mid: #1a1a2e;
+      --bg-card: #16213e;
+      --gold: #c9a227;
+      --gold-bright: #ffd700;
+      --red: #8b0000;
+      --red-bright: #e74c3c;
+      --blue-mana: #2980b9;
+      --blue-mana-bright: #3498db;
+      --text: #e8d5b7;
+      --text-dim: #a89070;
+      --border: #2a2a4a;
+      --border-gold: #c9a22744;
+      --font-rpg: 'Cinzel', serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      color: var(--text);
+      font-family: var(--font-rpg);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      background-image: 
+        radial-gradient(circle at 50% 20%, rgba(26, 26, 46, 0.8) 0%, rgba(13, 13, 26, 0.98) 80%),
+        repeating-linear-gradient(0deg, rgba(201, 162, 39, 0.015) 0px, rgba(201, 162, 39, 0.015) 1px, transparent 1px, transparent 30px);
+    }
+
+    /* TOP NAVBAR */
+    .rpg-navbar {
+      background: linear-gradient(180deg, #18182c 0%, #101020 100%);
+      border-bottom: 2px solid var(--gold);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.7);
+      padding: 10px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      z-index: 100;
+    }
+
+    .nav-left {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .btn-nav-back {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px;
+      background: rgba(22, 33, 62, 0.8);
+      color: var(--gold);
+      border: 1px solid var(--gold);
+      border-radius: 4px;
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 600;
+      letter-spacing: 1px;
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+
+    .btn-nav-back:hover {
+      background: var(--gold);
+      color: #0d0d1a;
+      box-shadow: 0 0 12px rgba(201, 162, 39, 0.5);
+    }
+
+    .nav-title {
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: var(--gold);
+      letter-spacing: 2px;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8), 0 0 10px rgba(201, 162, 39, 0.4);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    /* MAIN CONTAINER */
+    .registro-container {
+      max-width: 1200px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 24px 20px 40px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    /* SESSION BANNER */
+    .session-info-card {
+      background: linear-gradient(135deg, rgba(22, 33, 62, 0.9) 0%, rgba(13, 13, 26, 0.95) 100%);
+      border: 1px solid var(--gold);
+      border-radius: 6px;
+      padding: 18px 24px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.6), inset 0 0 15px rgba(201, 162, 39, 0.1);
+      gap: 16px;
+    }
+
+    .session-title-wrap {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .session-crest {
+      font-size: 2.2rem;
+      color: var(--gold);
+    }
+
+    .session-title-wrap h2 {
+      font-size: 1.3rem;
+      color: var(--gold);
+      letter-spacing: 1.5px;
+      margin-bottom: 4px;
+    }
+
+    .session-title-wrap p {
+      font-size: 0.85rem;
+      color: var(--text-dim);
+    }
+
+    .session-meta-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .session-chip {
+      background: #0f1526;
+      border: 1px solid var(--border-gold);
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .session-chip strong {
+      color: var(--gold);
+    }
+
+    /* HP & MANA TRACKING SECTION */
+    .vitals-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+
+    @media (max-width: 800px) {
+      .vitals-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .vitals-card {
+      background: rgba(22, 33, 62, 0.85);
+      border: 1px solid var(--border);
+      border-top: 2px solid var(--gold);
+      border-radius: 6px;
+      padding: 20px;
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.5);
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .vitals-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 10px;
+    }
+
+    .vitals-card-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--gold);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* BARS */
+    .bar-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .bar-label-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+
+    .progress-track {
+      background: #090c17;
+      height: 22px;
+      border-radius: 11px;
+      border: 1px solid var(--border);
+      overflow: hidden;
+      position: relative;
+      box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.8);
+    }
+
+    .progress-fill {
+      height: 100%;
+      transition: width 0.3s ease, background-color 0.3s ease;
+      position: relative;
+    }
+
+    .progress-fill.hp {
+      background: linear-gradient(90deg, #780202 0%, #c0392b 100%);
+    }
+
+    .progress-fill.mana {
+      background: linear-gradient(90deg, #1b4d89 0%, #2980b9 100%);
+    }
+
+    .vitals-controls {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 6px;
+      flex-wrap: wrap;
+    }
+
+    .btn-step {
+      background: #11182c;
+      border: 1px solid var(--border-gold);
+      color: var(--gold);
+      font-family: var(--font-rpg);
+      font-weight: 700;
+      font-size: 0.85rem;
+      padding: 5px 10px;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-step:hover {
+      background: var(--gold);
+      color: #0d0d1a;
+    }
+
+    .btn-step.minus {
+      border-color: #8b0000;
+      color: #e74c3c;
+    }
+    .btn-step.minus:hover {
+      background: #8b0000;
+      color: #fff;
+    }
+
+    /* REASON INPUT BOX */
+    .hp-reason-row {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      margin-top: 4px;
+    }
+
+    .hp-reason-input {
+      flex: 1;
+      background: #0c1120;
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 7px 10px;
+      border-radius: 4px;
+      font-family: var(--font-rpg);
+      font-size: 0.85rem;
+    }
+
+    .hp-reason-input:focus {
+      outline: none;
+      border-color: var(--gold);
+    }
+
+    /* TABLES SECTION */
+    .tables-section {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .table-container-card {
+      background: rgba(22, 33, 62, 0.8);
+      border: 1px solid var(--border);
+      border-top: 2px solid var(--gold);
+      border-radius: 6px;
+      overflow: hidden;
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.5);
+    }
+
+    .table-container-header {
+      padding: 12px 18px;
+      background: linear-gradient(180deg, rgba(201, 162, 39, 0.15) 0%, rgba(22, 33, 62, 0.95) 100%);
+      border-bottom: 1px solid var(--border-gold);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .table-container-header h3 {
+      font-size: 1rem;
+      color: var(--gold);
+      letter-spacing: 1.5px;
+      margin: 0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .table-wrapper {
+      width: 100%;
+      overflow-x: auto;
+    }
+
+    .rpg-table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 0.88rem;
+    }
+
+    .rpg-table th {
+      background: #0d1222;
+      color: var(--gold);
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--border);
+      font-weight: 700;
+      letter-spacing: 1px;
+    }
+
+    .rpg-table td {
+      padding: 10px 14px;
+      border-bottom: 1px solid rgba(42, 42, 74, 0.5);
+      color: var(--text);
+    }
+
+    .rpg-table tr:hover td {
+      background: rgba(201, 162, 39, 0.05);
+    }
+
+    .dice-total-pill {
+      display: inline-block;
+      font-weight: 900;
+      font-size: 1rem;
+      color: var(--gold-bright);
+      text-shadow: 0 0 8px rgba(201, 162, 39, 0.5);
+      padding: 2px 8px;
+      background: rgba(0, 0, 0, 0.4);
+      border-radius: 4px;
+      border: 1px solid var(--border-gold);
+    }
+
+    .hp-change-badge {
+      display: inline-block;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 3px;
+      font-size: 0.8rem;
+    }
+
+    .hp-change-badge.damage {
+      background: rgba(139, 0, 0, 0.4);
+      color: #ff6b6b;
+      border: 1px solid #8b0000;
+    }
+
+    .hp-change-badge.heal {
+      background: rgba(39, 174, 96, 0.4);
+      color: #2ecc71;
+      border: 1px solid #27ae60;
+    }
+
+    .empty-table-row {
+      text-align: center;
+      color: var(--text-dim);
+      padding: 24px !important;
+      font-style: italic;
+    }
+
+    /* QUICK NAVIGATION BAR */
+    .quick-nav-bar {
+      background: #101322;
+      border-top: 1px solid var(--border-gold);
+      padding: 10px 16px;
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .quick-nav-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(22, 33, 62, 0.9);
+      color: var(--text);
+      border: 1px solid var(--border);
+      padding: 8px 18px;
+      border-radius: 4px;
+      text-decoration: none;
+      font-size: 0.85rem;
+      font-weight: 600;
+      letter-spacing: 1px;
+      transition: all 0.2s ease;
+    }
+
+    .quick-nav-btn:hover {
+      border-color: var(--gold);
+      color: var(--gold);
+      background: rgba(201, 162, 39, 0.1);
+      box-shadow: 0 0 10px rgba(201, 162, 39, 0.25);
+    }
+
+    .quick-nav-btn.active {
+      background: var(--gold);
+      color: #0d0d1a;
+      border-color: #ffd700;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- TOP NAVBAR -->
+  <header class="rpg-navbar">
+    <div class="nav-left">
+      <a href="../dashboard.html" class="btn-nav-back" title="Voltar ao Painel">
+        <span>&larr;</span> Painel
+      </a>
+      <a href="hub.html" class="btn-nav-back" style="border-color:var(--border);" title="Ir para o Hub">
+        <span>🏰</span> Hub da Mesa
+      </a>
+      <div class="nav-title">
+        <span>📜</span> REGISTRO DE SESSÃO
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN CONTAINER -->
+  <main class="registro-container">
+
+    <!-- ACTIVE SESSION INFO -->
+    <div class="session-info-card">
+      <div class="session-title-wrap">
+        <div class="session-crest">⚔️</div>
+        <div>
+          <h2 id="sessionNameDisplay">A Maldição do Vale Esquecido</h2>
+          <p id="sessionDescDisplay">Campanha Principal &bull; Capítulo 4: As Catacumbas Negras</p>
+        </div>
+      </div>
+      <div class="session-meta-chips">
+        <div class="session-chip">
+          <span>⏰ Início:</span> <strong id="sessionStartTime">19:30</strong>
+        </div>
+        <div class="session-chip">
+          <span>🛡️ Rodada:</span> <strong id="sessionRoundNumber">Rodada #8</strong>
+        </div>
+        <div class="session-chip">
+          <span>👤 Personagem Ativo:</span> <strong id="activeCharNameDisplay">Guerreiro Valente</strong>
+        </div>
+      </div>
+    </div>
+
+    <!-- VITALS TRACKING (HP & MANA) -->
+    <section class="vitals-grid">
+      <!-- HP CARD -->
+      <div class="vitals-card">
+        <div class="vitals-card-header">
+          <div class="vitals-card-title">
+            <span>❤️</span> PONTOS DE VIDA (HP)
+          </div>
+          <div style="font-weight:700; color:var(--red-bright);" id="hpNumbers">
+            42 / 50
+          </div>
+        </div>
+
+        <div class="bar-group">
+          <div class="bar-label-row">
+            <span>Vitalidade Atual</span>
+            <span id="hpPercent">84%</span>
+          </div>
+          <div class="progress-track">
+            <div class="progress-fill hp" id="hpProgressBar" style="width: 84%;"></div>
+          </div>
+        </div>
+
+        <div>
+          <label style="font-size:0.75rem; color:var(--text-dim); display:block; margin-bottom:6px;">Alterar Pontos de Vida:</label>
+          <div class="vitals-controls">
+            <button class="btn-step minus" onclick="modifyHP(-5)">-5</button>
+            <button class="btn-step minus" onclick="modifyHP(-1)">-1</button>
+            <button class="btn-step" onclick="modifyHP(1)">+1</button>
+            <button class="btn-step" onclick="modifyHP(5)">+5</button>
+            <button class="btn-step" onclick="modifyHP(10)">+10</button>
+            <button class="btn-step" style="border-color:#27ae60; color:#2ecc71;" onclick="fullHealHP()">Cura Total</button>
+          </div>
+        </div>
+
+        <div class="hp-reason-row">
+          <input type="text" id="hpReasonInput" class="hp-reason-input" placeholder="Motivo da alteração (ex: Ataque orc, Poção)">
+        </div>
+      </div>
+
+      <!-- MANA CARD -->
+      <div class="vitals-card">
+        <div class="vitals-card-header">
+          <div class="vitals-card-title">
+            <span>✨</span> PONTOS DE MANA (MP)
+          </div>
+          <div style="font-weight:700; color:var(--blue-mana-bright);" id="manaNumbers">
+            25 / 30
+          </div>
+        </div>
+
+        <div class="bar-group">
+          <div class="bar-label-row">
+            <span>Energia Arcana Atual</span>
+            <span id="manaPercent">83%</span>
+          </div>
+          <div class="progress-track">
+            <div class="progress-fill mana" id="manaProgressBar" style="width: 83%;"></div>
+          </div>
+        </div>
+
+        <div>
+          <label style="font-size:0.75rem; color:var(--text-dim); display:block; margin-bottom:6px;">Gastar / Restaurar Mana:</label>
+          <div class="vitals-controls">
+            <button class="btn-step minus" onclick="modifyMana(-5)">-5</button>
+            <button class="btn-step minus" onclick="modifyMana(-1)">-1</button>
+            <button class="btn-step" onclick="modifyMana(1)">+1</button>
+            <button class="btn-step" onclick="modifyMana(5)">+5</button>
+            <button class="btn-step" style="border-color:#3498db; color:#3498db;" onclick="fullRestoreMana()">Descanso Total</button>
+          </div>
+        </div>
+
+        <div class="hp-reason-row">
+          <input type="text" id="manaReasonInput" class="hp-reason-input" placeholder="Magia conjurada ou item utilizado">
+        </div>
+      </div>
+    </section>
+
+    <!-- TABLES SECTION -->
+    <section class="tables-section">
+
+      <!-- DICE ROLLS TABLE -->
+      <div class="table-container-card">
+        <div class="table-container-header">
+          <h3><span>🎲</span> HISTÓRICO DE ROLAGENS DE DADOS</h3>
+          <button class="btn-step" onclick="clearDiceRolls()" style="font-size:0.75rem;">Limpar</button>
+        </div>
+        <div class="table-wrapper">
+          <table class="rpg-table">
+            <thead>
+              <tr>
+                <th>Hora</th>
+                <th>Jogador</th>
+                <th>Dado</th>
+                <th>Bônus</th>
+                <th>Resultado</th>
+                <th>Total</th>
+              </tr>
+            </thead>
+            <tbody id="diceRollsTableBody">
+              <!-- Rendered via JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- HP HISTORY LOG TABLE -->
+      <div class="table-container-card">
+        <div class="table-container-header">
+          <h3><span>🩸</span> REGISTRO DE ALTERAÇÕES DE VITALIDADE</h3>
+          <button class="btn-step" onclick="clearHpHistory()" style="font-size:0.75rem;">Limpar</button>
+        </div>
+        <div class="table-wrapper">
+          <table class="rpg-table">
+            <thead>
+              <tr>
+                <th>Hora</th>
+                <th>Personagem</th>
+                <th>Alteração</th>
+                <th>HP Resultante</th>
+                <th>Motivo / Fonte</th>
+              </tr>
+            </thead>
+            <tbody id="hpHistoryTableBody">
+              <!-- Rendered via JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- QUICK NAVIGATION BAR -->
+  <nav class="quick-nav-bar">
+    <a href="hub.html" class="quick-nav-btn">
+      <span>🏰</span> HUB Central
+    </a>
+    <a href="conteudos.html" class="quick-nav-btn">
+      <span>🖼️</span> Conteúdos da Sessão
+    </a>
+    <a href="registro-sessao.html" class="quick-nav-btn active">
+      <span>📜</span> Registro de Sessão
+    </a>
+    <a href="personagens-sessao.html" class="quick-nav-btn">
+      <span>⚔️</span> Personagens na Sessão
+    </a>
+  </nav>
+
+  <!-- AUTH JS SCRIPT -->
+  <script src="../assets/auth.js"></script>
+
+  <script>
+    // --- AUTH GUARD ---
+    const currentUser = (typeof requireAuth === 'function') ? requireAuth() : null;
+    if (!currentUser) {
+      const raw = sessionStorage.getItem('currentUser');
+      if (!raw) { window.location.href = '../index.html'; }
+    }
+    const _user = currentUser || JSON.parse(sessionStorage.getItem('currentUser') || '{"nome":"Jogador","login":"jogador"}');
+
+    // --- SESSION INFO INIT ---
+    function loadSessionHeaderInfo() {
+      try {
+        const sessionData = JSON.parse(localStorage.getItem('currentSession') || localStorage.getItem('activeSession') || '{}');
+        if (sessionData.name || sessionData.nome) {
+          document.getElementById('sessionNameDisplay').textContent = sessionData.name || sessionData.nome;
+        }
+        if (sessionData.description || sessionData.descricao) {
+          document.getElementById('sessionDescDisplay').textContent = sessionData.description || sessionData.descricao;
+        }
+        if (sessionData.startTime || sessionData.horaInicio) {
+          document.getElementById('sessionStartTime').textContent = sessionData.startTime || sessionData.horaInicio;
+        }
+        if (sessionData.round) {
+          document.getElementById('sessionRoundNumber').textContent = `Rodada #${sessionData.round}`;
+        }
+      } catch (e) {
+        console.error(e);
+      }
+      document.getElementById('activeCharNameDisplay').textContent = _user.nome || _user.login || 'Jogador';
+    }
+
+    // --- VITALS STATE & METHODS ---
+    const defaultVitals = {
+      currentHP: 42,
+      maxHP: 50,
+      currentMana: 25,
+      maxMana: 30
+    };
+
+    function getUserVitals() {
+      try {
+        const key = `vitals_${_user.nome || _user.login || 'default'}`;
+        const stored = localStorage.getItem(key) || localStorage.getItem('userVitals');
+        if (stored) return JSON.parse(stored);
+      } catch (e) {}
+      return { ...defaultVitals };
+    }
+
+    function saveUserVitals(vitals) {
+      const key = `vitals_${_user.nome || _user.login || 'default'}`;
+      localStorage.setItem(key, JSON.stringify(vitals));
+      localStorage.setItem('userVitals', JSON.stringify(vitals));
+    }
+
+    function getHpHistory() {
+      try {
+        const raw = localStorage.getItem('hpHistoryLog');
+        return raw ? JSON.parse(raw) : [];
+      } catch (e) {
+        return [];
+      }
+    }
+
+    function recordHpChange(delta, currentHp, reason) {
+      const history = getHpHistory();
+      const now = new Date();
+      const timeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+
+      history.unshift({
+        id: Date.now(),
+        timestamp: timeStr,
+        character: _user.nome || _user.login || 'Herói',
+        delta: delta,
+        resultingHp: currentHp,
+        reason: reason || (delta < 0 ? 'Dano sofrido' : 'Recuperação')
+      });
+
+      if (history.length > 50) history.pop();
+      localStorage.setItem('hpHistoryLog', JSON.stringify(history));
+      renderHpHistoryTable();
+    }
+
+    function updateVitalsUI() {
+      const vitals = getUserVitals();
+
+      // HP
+      const hpPct = Math.max(0, Math.min(100, Math.round((vitals.currentHP / vitals.maxHP) * 100)));
+      document.getElementById('hpNumbers').textContent = `${vitals.currentHP} / ${vitals.maxHP}`;
+      document.getElementById('hpPercent').textContent = `${hpPct}%`;
+      const hpBar = document.getElementById('hpProgressBar');
+      hpBar.style.width = `${hpPct}%`;
+
+      // Mana
+      const manaPct = Math.max(0, Math.min(100, Math.round((vitals.currentMana / vitals.maxMana) * 100)));
+      document.getElementById('manaNumbers').textContent = `${vitals.currentMana} / ${vitals.maxMana}`;
+      document.getElementById('manaPercent').textContent = `${manaPct}%`;
+      document.getElementById('manaProgressBar').style.width = `${manaPct}%`;
+    }
+
+    function modifyHP(delta) {
+      const vitals = getUserVitals();
+      const oldHp = vitals.currentHP;
+      vitals.currentHP = Math.max(0, Math.min(vitals.maxHP, vitals.currentHP + delta));
+      const appliedDelta = vitals.currentHP - oldHp;
+
+      if (appliedDelta !== 0) {
+        const reasonInput = document.getElementById('hpReasonInput');
+        const reason = reasonInput.value.trim();
+        reasonInput.value = '';
+
+        saveUserVitals(vitals);
+        recordHpChange(appliedDelta, vitals.currentHP, reason);
+        updateVitalsUI();
+      }
+    }
+
+    function fullHealHP() {
+      const vitals = getUserVitals();
+      const diff = vitals.maxHP - vitals.currentHP;
+      if (diff > 0) {
+        vitals.currentHP = vitals.maxHP;
+        saveUserVitals(vitals);
+        recordHpChange(diff, vitals.currentHP, 'Cura Máxima Total');
+        updateVitalsUI();
+      }
+    }
+
+    function modifyMana(delta) {
+      const vitals = getUserVitals();
+      vitals.currentMana = Math.max(0, Math.min(vitals.maxMana, vitals.currentMana + delta));
+      saveUserVitals(vitals);
+      updateVitalsUI();
+      document.getElementById('manaReasonInput').value = '';
+    }
+
+    function fullRestoreMana() {
+      const vitals = getUserVitals();
+      vitals.currentMana = vitals.maxMana;
+      saveUserVitals(vitals);
+      updateVitalsUI();
+    }
+
+    // --- DICE TABLE RENDER ---
+    function renderDiceRollsTable() {
+      const tableBody = document.getElementById('diceRollsTableBody');
+      let rolls = [];
+      try {
+        rolls = JSON.parse(localStorage.getItem('diceHistory') || '[]');
+      } catch (e) {}
+
+      if (rolls.length === 0) {
+        // Fallback demo rows if none yet
+        rolls = [
+          { timestamp: '19:42:15', user: 'Thorin', sides: 20, bonus: 3, rawRoll: 17, total: 20 },
+          { timestamp: '19:38:02', user: 'Aeloria', sides: 8, bonus: 2, rawRoll: 6, total: 8 },
+          { timestamp: '19:35:50', user: 'Guerreiro Valente', sides: 20, bonus: 5, rawRoll: 15, total: 20 }
+        ];
+      }
+
+      tableBody.innerHTML = '';
+      rolls.forEach(r => {
+        const tr = document.createElement('tr');
+        const sign = (r.bonus >= 0) ? '+' : '';
+        tr.innerHTML = `
+          <td>${r.timestamp}</td>
+          <td style="font-weight:700; color:var(--text);">${r.user}</td>
+          <td><span style="color:var(--gold); font-weight:700;">d${r.sides}</span></td>
+          <td>${sign}${r.bonus}</td>
+          <td>[${r.rawRoll}]</td>
+          <td><span class="dice-total-pill">${r.total}</span></td>
+        `;
+        tableBody.appendChild(tr);
+      });
+    }
+
+    function clearDiceRolls() {
+      if (confirm('Deseja limpar todo o histórico de rolagens de dados?')) {
+        localStorage.removeItem('diceHistory');
+        renderDiceRollsTable();
+      }
+    }
+
+    // --- HP HISTORY TABLE RENDER ---
+    function renderHpHistoryTable() {
+      const tbody = document.getElementById('hpHistoryTableBody');
+      let logs = getHpHistory();
+
+      if (logs.length === 0) {
+        logs = [
+          { id: 1, timestamp: '19:45:10', character: 'Guerreiro Valente', delta: -8, resultingHp: 42, reason: 'Golpe de maça do Chefe Orc' },
+          { id: 2, timestamp: '19:31:00', character: 'Guerreiro Valente', delta: 5, resultingHp: 50, reason: 'Poção Menor de Cura' }
+        ];
+      }
+
+      tbody.innerHTML = '';
+      logs.forEach(log => {
+        const tr = document.createElement('tr');
+        const isDamage = log.delta < 0;
+        const badgeClass = isDamage ? 'damage' : 'heal';
+        const sign = log.delta > 0 ? '+' : '';
+
+        tr.innerHTML = `
+          <td>${log.timestamp}</td>
+          <td style="font-weight:700;">${log.character}</td>
+          <td><span class="hp-change-badge ${badgeClass}">${sign}${log.delta} HP</span></td>
+          <td><strong>${log.resultingHp}</strong></td>
+          <td style="color:var(--text-dim);">${log.reason}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function clearHpHistory() {
+      if (confirm('Deseja limpar o histórico de alterações de HP?')) {
+        localStorage.removeItem('hpHistoryLog');
+        renderHpHistoryTable();
+      }
+    }
+
+    // INIT
+    loadSessionHeaderInfo();
+    updateVitalsUI();
+    renderDiceRollsTable();
+    renderHpHistoryTable();
+
+    // Auto-refresh tables every 3 seconds to catch live dice rolls from the Hub
+    setInterval(() => {
+      renderDiceRollsTable();
+    }, 3000);
+  </script>
+</body>
+</html>

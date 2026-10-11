@@ -1,0 +1,1274 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Controle da Mesa - RPG Virtual</title>
+  <link rel="stylesheet" href="../assets/style.css">
+  <style>
+    /* Specific styles for Controle da Mesa */
+    .mesa-layout {
+      display: grid;
+      grid-template-columns: 340px 1fr;
+      gap: 20px;
+      margin-top: 20px;
+      min-height: calc(100vh - 120px);
+    }
+
+    @media (max-width: 1024px) {
+      .mesa-layout {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Sidebar Navigation & Sub-tabs */
+    .sidebar-panel {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .main-tabs {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .tab-btn {
+      background: var(--bg-mid);
+      color: var(--text);
+      border: 1px solid var(--border);
+      padding: 12px 16px;
+      font-family: inherit;
+      font-weight: 600;
+      font-size: 0.95rem;
+      border-radius: 6px;
+      cursor: pointer;
+      text-align: left;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .tab-btn:hover {
+      border-color: var(--gold);
+      background: rgba(201, 162, 39, 0.1);
+      color: var(--gold);
+    }
+
+    .tab-btn.active {
+      background: linear-gradient(135deg, rgba(201, 162, 39, 0.25), rgba(139, 105, 20, 0.15));
+      border-color: var(--gold);
+      color: var(--gold);
+      box-shadow: inset 0 0 10px rgba(201, 162, 39, 0.2);
+    }
+
+    .sub-tabs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px;
+      padding-left: 8px;
+      margin-top: 4px;
+    }
+
+    .sub-tab-btn {
+      background: rgba(13, 13, 26, 0.6);
+      color: var(--text-dim);
+      border: 1px solid var(--border);
+      padding: 6px 10px;
+      font-size: 0.8rem;
+      font-family: inherit;
+      border-radius: 4px;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.2s ease;
+    }
+
+    .sub-tab-btn:hover {
+      color: var(--text);
+      border-color: var(--gold-dark);
+    }
+
+    .sub-tab-btn.active {
+      background: var(--gold);
+      color: #0d0d1a;
+      border-color: var(--gold);
+      font-weight: bold;
+    }
+
+    /* Upload Box */
+    .upload-box {
+      background: rgba(13, 13, 26, 0.7);
+      border: 1px dashed var(--border);
+      border-radius: 6px;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .upload-box:hover {
+      border-color: var(--gold);
+    }
+
+    .upload-box h4 {
+      font-size: 0.9rem;
+      color: var(--gold);
+      margin-bottom: 2px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .upload-box input[type="text"],
+    .upload-box select {
+      width: 100%;
+      background: var(--bg-dark);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 8px;
+      border-radius: 4px;
+      font-family: inherit;
+      font-size: 0.85rem;
+    }
+
+    .upload-box input[type="file"] {
+      font-size: 0.8rem;
+      color: var(--text-dim);
+    }
+
+    /* Main Area: Gallery & Preview */
+    .main-workspace {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    /* Mesa Preview Panel */
+    .preview-panel {
+      background: var(--bg-card);
+      border: 1px solid var(--gold);
+      border-radius: 8px;
+      padding: 16px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .preview-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 10px;
+    }
+
+    .preview-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--gold);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .preview-controls {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 0.85rem;
+      color: var(--text-dim);
+    }
+
+    .zoom-slider-container {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .zoom-slider-container input[type="range"] {
+      accent-color: var(--gold);
+      cursor: pointer;
+      width: 110px;
+    }
+
+    .preview-viewport {
+      background: #05050a;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      min-height: 280px;
+      max-height: 400px;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: inset 0 0 20px rgba(0,0,0,0.8);
+    }
+
+    .preview-stage {
+      transition: transform 0.2s ease;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: center;
+      gap: 16px;
+      padding: 16px;
+      max-width: 100%;
+      max-height: 100%;
+    }
+
+    .preview-item {
+      position: relative;
+      border-radius: 6px;
+      overflow: hidden;
+      border: 2px solid var(--gold);
+      box-shadow: 0 4px 15px rgba(0,0,0,0.7);
+      background: #000;
+      max-width: 260px;
+      max-height: 220px;
+    }
+
+    .preview-item img,
+    .preview-item video {
+      display: block;
+      max-width: 100%;
+      max-height: 180px;
+      object-fit: cover;
+    }
+
+    .preview-item .preview-badge {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: rgba(13, 13, 26, 0.85);
+      color: var(--text);
+      font-size: 0.75rem;
+      padding: 4px 6px;
+      text-align: center;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      border-top: 1px solid var(--border);
+    }
+
+    .preview-empty {
+      color: var(--text-dim);
+      font-style: italic;
+      font-size: 0.95rem;
+      text-align: center;
+      padding: 40px;
+    }
+
+    /* Gallery Panel */
+    .gallery-panel {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .gallery-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 12px;
+    }
+
+    .gallery-header h3 {
+      color: var(--gold);
+      font-size: 1.15rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 16px;
+    }
+
+    .gallery-card {
+      background: var(--bg-mid);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      transition: transform 0.2s ease, border-color 0.2s ease;
+    }
+
+    .gallery-card:hover {
+      border-color: var(--gold);
+      transform: translateY(-2px);
+    }
+
+    .gallery-card.on-mesa {
+      border-color: #27ae60;
+      box-shadow: 0 0 10px rgba(39, 174, 96, 0.3);
+    }
+
+    .gallery-thumb-wrapper {
+      position: relative;
+      width: 100%;
+      height: 140px;
+      background: #000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    .gallery-thumb-wrapper img,
+    .gallery-thumb-wrapper video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .media-type-badge {
+      position: absolute;
+      top: 6px;
+      right: 6px;
+      background: rgba(13, 13, 26, 0.85);
+      border: 1px solid var(--border);
+      color: var(--gold);
+      font-size: 0.7rem;
+      padding: 2px 6px;
+      border-radius: 4px;
+      text-transform: uppercase;
+      font-weight: bold;
+    }
+
+    .mesa-active-badge {
+      position: absolute;
+      top: 6px;
+      left: 6px;
+      background: #27ae60;
+      color: #fff;
+      font-size: 0.65rem;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-weight: bold;
+      letter-spacing: 0.5px;
+    }
+
+    .gallery-card-body {
+      padding: 10px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      flex-grow: 1;
+    }
+
+    .gallery-card-title {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--text);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .gallery-card-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-top: auto;
+    }
+
+    .btn-mesa-action {
+      width: 100%;
+      padding: 7px 10px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      border-radius: 4px;
+      border: none;
+      cursor: pointer;
+      font-family: inherit;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+    }
+
+    .btn-add-mesa {
+      background: linear-gradient(135deg, #c9a227, #8b6914);
+      color: #0d0d1a;
+    }
+    .btn-add-mesa:hover {
+      filter: brightness(1.2);
+    }
+
+    .btn-remove-mesa {
+      background: linear-gradient(135deg, #8b0000, #c0392b);
+      color: #fff;
+    }
+    .btn-remove-mesa:hover {
+      filter: brightness(1.2);
+    }
+
+    .btn-toggle-loop {
+      background: var(--bg-dark);
+      border: 1px solid var(--border);
+      color: var(--text-dim);
+      padding: 5px 8px;
+      font-size: 0.75rem;
+      cursor: pointer;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+    }
+
+    .btn-toggle-loop.active {
+      color: var(--gold);
+      border-color: var(--gold);
+      background: rgba(201, 162, 39, 0.1);
+    }
+
+    /* Floating Draggable Dice Panel */
+    .floating-dice-panel {
+      position: fixed;
+      bottom: 20px;
+      right: 25px;
+      width: 320px;
+      background: #141824;
+      border: 2px solid var(--gold);
+      border-radius: 10px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8), 0 0 15px rgba(201, 162, 39, 0.2);
+      z-index: 1000;
+      user-select: none;
+      overflow: hidden;
+      transition: height 0.2s ease;
+    }
+
+    .floating-dice-header {
+      background: linear-gradient(135deg, #1f273d, #141824);
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--border);
+      cursor: grab;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-weight: 700;
+      color: var(--gold);
+      font-size: 0.9rem;
+      letter-spacing: 1px;
+    }
+
+    .floating-dice-header:active {
+      cursor: grabbing;
+    }
+
+    .dice-header-tools {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .dice-panel-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-dim);
+      cursor: pointer;
+      font-size: 1rem;
+      padding: 2px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: color 0.2s;
+    }
+
+    .dice-panel-btn:hover {
+      color: var(--gold);
+    }
+
+    .floating-dice-body {
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      background: rgba(13, 13, 26, 0.95);
+    }
+
+    .dice-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+    }
+
+    .dice-btn {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-family: inherit;
+      font-weight: bold;
+      font-size: 0.85rem;
+      padding: 10px 4px;
+      border-radius: 6px;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      transition: all 0.2s ease;
+    }
+
+    .dice-btn:hover {
+      border-color: var(--gold);
+      color: var(--gold);
+      background: rgba(201, 162, 39, 0.15);
+      transform: translateY(-2px);
+    }
+
+    .dice-result-container {
+      background: #090a10;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 12px;
+      text-align: center;
+      min-height: 70px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .dice-result-label {
+      font-size: 0.75rem;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .dice-result-val {
+      font-size: 2rem;
+      font-weight: 900;
+      color: var(--gold);
+      text-shadow: 0 0 10px rgba(201, 162, 39, 0.5);
+      line-height: 1.1;
+      margin-top: 2px;
+    }
+
+    .dice-result-val.rolling {
+      animation: spinDice 0.4s ease-in-out infinite;
+    }
+
+    @keyframes spinDice {
+      0% { transform: scale(0.9) rotate(0deg); opacity: 0.6; }
+      50% { transform: scale(1.1) rotate(180deg); opacity: 1; }
+      100% { transform: scale(0.9) rotate(360deg); opacity: 0.6; }
+    }
+
+    .dice-recent-logs {
+      font-size: 0.75rem;
+      color: var(--text-dim);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      max-height: 48px;
+      overflow-y: auto;
+    }
+
+    .dice-tag {
+      background: rgba(255, 255, 255, 0.05);
+      padding: 2px 6px;
+      border-radius: 3px;
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Navigation Bar -->
+  <header style="background: var(--bg-mid); border-bottom: 2px solid var(--gold); padding: 12px 24px;">
+    <div style="max-width: 1400px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center;">
+      <div style="display: flex; align-items: center; gap: 16px;">
+        <a href="../dashboard.html" class="btn-gold" style="padding: 6px 14px; font-size: 0.85rem;">
+          &larr; Voltar ao Painel
+        </a>
+        <h1 style="color: var(--gold); font-size: 1.3rem; letter-spacing: 1.5px; font-weight: 700;">
+          CONTROLE DA MESA
+        </h1>
+      </div>
+      <div style="display: flex; align-items: center; gap: 14px;">
+        <span id="userDisplayName" style="font-size: 0.9rem; color: var(--text-dim);">Mestre: ...</span>
+        <button onclick="logout()" class="btn-red" style="padding: 6px 14px; font-size: 0.85rem;">Sair</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="page-wrapper">
+    <div class="mesa-layout">
+      
+      <!-- Left Sidebar Tabs & Upload -->
+      <aside class="sidebar-panel">
+        <h3 style="font-size: 1rem; color: var(--gold); text-transform: uppercase; letter-spacing: 1px; border-bottom: 1px solid var(--border); padding-bottom: 8px;">
+          Categorias
+        </h3>
+
+        <div class="main-tabs">
+          <button class="tab-btn active" id="tabBtnCenarios" onclick="switchTab('cenarios')">
+            <span>&#128506;</span> CENÁRIOS
+          </button>
+          
+          <!-- Sub-tabs for Cenários -->
+          <div class="sub-tabs" id="cenariosSubTabs">
+            <button class="sub-tab-btn active" onclick="switchCenarioSubTab('MAPAS', this)">MAPAS</button>
+            <button class="sub-tab-btn" onclick="switchCenarioSubTab('PAISAGENS', this)">PAISAGENS</button>
+            <button class="sub-tab-btn" onclick="switchCenarioSubTab('INTERIORES', this)">INTERIORES</button>
+            <button class="sub-tab-btn" onclick="switchCenarioSubTab('CONSTRUÇÕES', this)">CONSTRUÇÕES</button>
+          </div>
+
+          <button class="tab-btn" id="tabBtnConteudo" onclick="switchTab('conteudo')">
+            <span>&#128214;</span> CONTEÚDO
+          </button>
+
+          <button class="tab-btn" id="tabBtnApresentacao" onclick="switchTab('apresentacao')">
+            <span>&#127917;</span> APRESENTAÇÃO
+          </button>
+        </div>
+
+        <!-- Upload Form Box -->
+        <div class="upload-box">
+          <h4 id="uploadBoxTitle">Novo Item (Cenário)</h4>
+          <input type="text" id="uploadItemName" placeholder="Nome do item..." />
+          
+          <div id="uploadTypeSelectorContainer" style="display: none;">
+            <select id="uploadMediaType">
+              <option value="imagem">Imagem</option>
+              <option value="video">Vídeo</option>
+            </select>
+          </div>
+
+          <input type="file" id="uploadItemFile" accept="image/*,video/*" />
+          
+          <button class="btn-gold" style="width: 100%; padding: 8px;" onclick="handleUpload()">
+            + Adicionar à Galeria
+          </button>
+        </div>
+      </aside>
+
+      <!-- Main Area: Gallery and Mesa Preview -->
+      <section class="main-workspace">
+
+        <!-- Live Mesa Preview -->
+        <div class="preview-panel">
+          <div class="preview-header">
+            <div class="preview-title">
+              <span>&#128065;</span> PRÉVIA DA MESA (VISÃO DOS JOGADORES)
+            </div>
+            
+            <div class="preview-controls">
+              <div class="zoom-slider-container">
+                <label for="zoomSlider">Zoom:</label>
+                <input type="range" id="zoomSlider" min="0.5" max="2.0" step="0.1" value="1.0" oninput="handleZoomChange(this.value)">
+                <span id="zoomValText" style="min-width: 36px; text-align: right; color: var(--gold);">100%</span>
+              </div>
+              <button onclick="resetZoom()" class="btn-gold" style="padding: 4px 10px; font-size: 0.75rem;">Reset</button>
+            </div>
+          </div>
+
+          <div class="preview-viewport" id="previewViewport">
+            <div class="preview-stage" id="previewStage">
+              <!-- Rendered items currently on mesaContent -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Selected Category Gallery -->
+        <div class="gallery-panel">
+          <div class="gallery-header">
+            <h3 id="galleryTitle">
+              <span>&#128295;</span> Galeria de Cenários: MAPAS
+            </h3>
+            <span id="galleryCount" style="font-size: 0.85rem; color: var(--text-dim);">0 itens encontrados</span>
+          </div>
+
+          <div class="gallery-grid" id="galleryGrid">
+            <!-- Dynamic Gallery Cards -->
+          </div>
+        </div>
+
+      </section>
+
+    </div>
+  </main>
+
+  <!-- Floating Draggable Dice Panel -->
+  <div class="floating-dice-panel" id="floatingDicePanel">
+    <div class="floating-dice-header" id="floatingDiceHeader">
+      <span>&#127922; ROLAGEM DE DADOS</span>
+      <div class="dice-header-tools">
+        <button class="dice-panel-btn" onclick="toggleDiceMinimize()" title="Minimizar / Expandir" id="btnMinimizeDice">&#8722;</button>
+      </div>
+    </div>
+    
+    <div class="floating-dice-body" id="floatingDiceBody">
+      <div class="dice-result-container">
+        <div class="dice-result-label" id="diceRollLabel">Clique em um dado</div>
+        <div class="dice-result-val" id="diceRollVal">-</div>
+      </div>
+
+      <div class="dice-grid">
+        <button class="dice-btn" onclick="rollDie(2)">d2</button>
+        <button class="dice-btn" onclick="rollDie(4)">d4</button>
+        <button class="dice-btn" onclick="rollDie(6)">d6</button>
+        <button class="dice-btn" onclick="rollDie(8)">d8</button>
+        <button class="dice-btn" onclick="rollDie(10)">d10</button>
+        <button class="dice-btn" onclick="rollDie(12)">d12</button>
+        <button class="dice-btn" onclick="rollDie(20)">d20</button>
+        <button class="dice-btn" onclick="rollDie(100)">d100</button>
+      </div>
+
+      <div style="border-top: 1px solid var(--border); padding-top: 8px;">
+        <div style="font-size: 0.75rem; color: var(--text-dim); margin-bottom: 4px;">ÚLTIMAS ROLAGENS:</div>
+        <div class="dice-recent-logs" id="diceRecentLogs">
+          <!-- Filled dynamically -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="../assets/auth.js"></script>
+  <script>
+    // 1. Guard & Authentication
+    const currentUser = requireMestre();
+    if (currentUser) {
+      const userDisplay = document.getElementById('userDisplayName');
+      if (userDisplay) userDisplay.textContent = `Mestre: ${currentUser.nome || currentUser.login}`;
+    }
+
+    // 2. Storage helper keys
+    const KEYS = {
+      CENARIOS: 'cenarios',
+      CONTEUDO: 'conteudo',
+      APRESENTACAO: 'apresentacao',
+      MESA_CONTENT: 'rpg_mesa_content',
+      CONTEUDOS_HISTORY: 'conteudosHistory',
+      MESA_ZOOM: 'mesaZoom',
+      DICE_HISTORY: 'rpg_mesa_dice_history'
+    };
+
+    // State Variables
+    let currentTab = 'cenarios'; // 'cenarios' | 'conteudo' | 'apresentacao'
+    let currentCenarioSub = 'MAPAS'; // 'MAPAS' | 'PAISAGENS' | 'INTERIORES' | 'CONSTRUÇÕES'
+
+    // Initialize Default Samples if LocalStorage is totally empty
+    function seedDefaultGalleries() {
+      if (!localStorage.getItem(KEYS.CENARIOS)) {
+        const defaultCenarios = [
+          {
+            id: 'cen_1',
+            name: 'Catacumbas Antigas',
+            category: 'MAPAS',
+            tipo: 'imagem',
+            data: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=800&auto=format&fit=crop&q=80',
+            dateAdded: new Date().toISOString()
+          },
+          {
+            id: 'cen_2',
+            name: 'Pico Nevado dos Dragões',
+            category: 'PAISAGENS',
+            tipo: 'imagem',
+            data: 'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=800&auto=format&fit=crop&q=80',
+            dateAdded: new Date().toISOString()
+          },
+          {
+            id: 'cen_3',
+            name: 'Taverna do Javali Bêbado',
+            category: 'INTERIORES',
+            tipo: 'imagem',
+            data: 'https://images.unsplash.com/photo-1572025442646-866d16c84a54?w=800&auto=format&fit=crop&q=80',
+            dateAdded: new Date().toISOString()
+          },
+          {
+            id: 'cen_4',
+            name: 'Torre de Vigia Abandonada',
+            category: 'CONSTRUÇÕES',
+            tipo: 'imagem',
+            data: 'https://images.unsplash.com/photo-1514539079130-25950c84af65?w=800&auto=format&fit=crop&q=80',
+            dateAdded: new Date().toISOString()
+          }
+        ];
+        localStorage.setItem(KEYS.CENARIOS, JSON.stringify(defaultCenarios));
+      }
+
+      if (!localStorage.getItem(KEYS.CONTEUDO)) {
+        const defaultConteudo = [
+          {
+            id: 'cnt_1',
+            name: 'Pergaminho dos Antigos',
+            tipo: 'imagem',
+            data: 'https://images.unsplash.com/photo-1589829085413-56de8ae18c73?w=800&auto=format&fit=crop&q=80',
+            dateAdded: new Date().toISOString()
+          },
+          {
+            id: 'cnt_2',
+            name: 'Animação de Portal Místico',
+            tipo: 'video',
+            loop: true,
+            data: 'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4',
+            dateAdded: new Date().toISOString()
+          }
+        ];
+        localStorage.setItem(KEYS.CONTEUDO, JSON.stringify(defaultConteudo));
+      }
+
+      if (!localStorage.getItem(KEYS.APRESENTACAO)) {
+        const defaultApresentacao = [
+          {
+            id: 'apr_1',
+            name: 'Apresentação do Chefe Orc',
+            tipo: 'imagem',
+            data: 'https://images.unsplash.com/photo-1563089145-599997674d42?w=800&auto=format&fit=crop&q=80',
+            dateAdded: new Date().toISOString()
+          }
+        ];
+        localStorage.setItem(KEYS.APRESENTACAO, JSON.stringify(defaultApresentacao));
+      }
+    }
+
+    // 3. Tab Navigation Handlers
+    function switchTab(tab) {
+      currentTab = tab;
+      
+      document.getElementById('tabBtnCenarios').classList.toggle('active', tab === 'cenarios');
+      document.getElementById('tabBtnConteudo').classList.toggle('active', tab === 'conteudo');
+      document.getElementById('tabBtnApresentacao').classList.toggle('active', tab === 'apresentacao');
+      
+      const subTabs = document.getElementById('cenariosSubTabs');
+      subTabs.style.display = (tab === 'cenarios') ? 'grid' : 'none';
+
+      const typeSelectorContainer = document.getElementById('uploadTypeSelectorContainer');
+      const uploadBoxTitle = document.getElementById('uploadBoxTitle');
+
+      if (tab === 'cenarios') {
+        uploadBoxTitle.textContent = `Novo Cenário (${currentCenarioSub})`;
+        typeSelectorContainer.style.display = 'none';
+      } else if (tab === 'conteudo') {
+        uploadBoxTitle.textContent = 'Novo Conteúdo (Geral)';
+        typeSelectorContainer.style.display = 'block';
+      } else {
+        uploadBoxTitle.textContent = 'Nova Apresentação';
+        typeSelectorContainer.style.display = 'block';
+      }
+
+      loadGallery();
+    }
+
+    function switchCenarioSubTab(subTab, btn) {
+      currentCenarioSub = subTab;
+      const allSubBtns = document.querySelectorAll('.sub-tab-btn');
+      allSubBtns.forEach(b => b.classList.remove('active'));
+      if (btn) btn.classList.add('active');
+
+      document.getElementById('uploadBoxTitle').textContent = `Novo Cenário (${currentCenarioSub})`;
+      loadGallery();
+    }
+
+    // 4. Load & Render Gallery
+    function getStoredItems(key) {
+      try {
+        return JSON.parse(localStorage.getItem(key)) || [];
+      } catch (e) {
+        return [];
+      }
+    }
+
+    function setStoredItems(key, items) {
+      localStorage.setItem(key, JSON.stringify(items));
+    }
+
+    function loadGallery() {
+      const galleryGrid = document.getElementById('galleryGrid');
+      const galleryTitle = document.getElementById('galleryTitle');
+      const galleryCount = document.getElementById('galleryCount');
+      const mesaItems = getMesaContent();
+
+      galleryGrid.innerHTML = '';
+      let items = [];
+
+      if (currentTab === 'cenarios') {
+        galleryTitle.innerHTML = `<span>&#128506;</span> Galeria de Cenários: ${currentCenarioSub}`;
+        const allCenarios = getStoredItems(KEYS.CENARIOS);
+        items = allCenarios.filter(item => (item.category || 'MAPAS').toUpperCase() === currentCenarioSub.toUpperCase());
+      } else if (currentTab === 'conteudo') {
+        galleryTitle.innerHTML = `<span>&#128214;</span> Galeria de Conteúdos da Mesa`;
+        items = getStoredItems(KEYS.CONTEUDO);
+      } else if (currentTab === 'apresentacao') {
+        galleryTitle.innerHTML = `<span>&#127917;</span> Apresentações e Destaques`;
+        items = getStoredItems(KEYS.APRESENTACAO);
+      }
+
+      galleryCount.textContent = `${items.length} ${items.length === 1 ? 'item' : 'itens'} no catálogo`;
+
+      if (items.length === 0) {
+        galleryGrid.innerHTML = `<div style="grid-column: 1/-1; text-align: center; padding: 40px; color: var(--text-dim); font-style: italic;">Nenhum item cadastrado nesta categoria. Utilize o formulário ao lado para adicionar.</div>`;
+        return;
+      }
+
+      items.forEach(item => {
+        const isOnMesa = mesaItems.some(m => m.id === item.id);
+        const card = document.createElement('div');
+        card.className = `gallery-card ${isOnMesa ? 'on-mesa' : ''}`;
+
+        const isVideo = (item.tipo === 'video' || (item.data && item.data.startsWith('data:video/')) || (item.data && item.data.endsWith('.mp4')));
+
+        let mediaHtml = '';
+        if (isVideo) {
+          mediaHtml = `<video src="${item.data}" muted playsinline loop></video>`;
+        } else {
+          mediaHtml = `<img src="${item.data}" alt="${item.name}" loading="lazy" />`;
+        }
+
+        const loopActive = item.loop === true;
+
+        card.innerHTML = `
+          <div class="gallery-thumb-wrapper">
+            ${mediaHtml}
+            <span class="media-type-badge">${isVideo ? 'Vídeo' : 'Imagem'}</span>
+            ${isOnMesa ? '<span class="mesa-active-badge">NA MESA</span>' : ''}
+          </div>
+          <div class="gallery-card-body">
+            <div class="gallery-card-title" title="${item.name}">${item.name}</div>
+            <div class="gallery-card-actions">
+              ${isOnMesa ? `
+                <button class="btn-mesa-action btn-remove-mesa" onclick="removeFromMesa('${item.id}')">
+                  &#10006; Remover da Mesa
+                </button>
+              ` : `
+                <button class="btn-mesa-action btn-add-mesa" onclick="addToMesa('${item.id}')">
+                  &#10010; Adicionar à Mesa
+                </button>
+              `}
+              ${isVideo ? `
+                <button class="btn-toggle-loop ${loopActive ? 'active' : ''}" onclick="toggleVideoLoop('${item.id}')">
+                  &#128257; Loop: ${loopActive ? 'Ativo' : 'Desativado'}
+                </button>
+              ` : ''}
+            </div>
+          </div>
+        `;
+        galleryGrid.appendChild(card);
+      });
+
+      renderMesaPreview();
+    }
+
+    // 5. Mesa Actions (addToMesa, removeFromMesa, toggleVideoLoop)
+    function addToMesa(itemId) {
+      let allPool = [
+        ...getStoredItems(KEYS.CENARIOS),
+        ...getStoredItems(KEYS.CONTEUDO),
+        ...getStoredItems(KEYS.APRESENTACAO)
+      ];
+
+      const item = allPool.find(x => x.id === itemId);
+      if (!item) return;
+
+      let mesaList = getMesaContent();
+      if (!mesaList.some(m => m.id === item.id)) {
+        const mesaObj = {
+          id: item.id,
+          tipo: item.tipo || 'imagem',
+          titulo: item.name,
+          url: item.data,
+          loop: item.loop || false,
+          visivelJogadores: true,
+          addedAt: new Date().toISOString()
+        };
+        mesaList.push(mesaObj);
+        saveMesaContent(mesaList);
+
+        // Also add to conteudosHistory
+        try {
+          let history = JSON.parse(localStorage.getItem(KEYS.CONTEUDOS_HISTORY)) || [];
+          history.push({
+            id: 'hist_' + Date.now(),
+            itemId: item.id,
+            name: item.name,
+            tipo: item.tipo || 'imagem',
+            timestamp: new Date().toISOString()
+          });
+          localStorage.setItem(KEYS.CONTEUDOS_HISTORY, JSON.stringify(history));
+        } catch (e) {
+          console.error('Error saving conteudosHistory:', e);
+        }
+      }
+
+      loadGallery();
+    }
+
+    function removeFromMesa(itemId) {
+      let mesaList = getMesaContent();
+      mesaList = mesaList.filter(item => item.id !== itemId);
+      saveMesaContent(mesaList);
+      loadGallery();
+    }
+
+    function toggleVideoLoop(itemId) {
+      const storageKeys = [KEYS.CENARIOS, KEYS.CONTEUDO, KEYS.APRESENTACAO];
+      storageKeys.forEach(k => {
+        let items = getStoredItems(k);
+        let found = false;
+        items = items.map(item => {
+          if (item.id === itemId) {
+            item.loop = !item.loop;
+            found = true;
+          }
+          return item;
+        });
+        if (found) setStoredItems(k, items);
+      });
+
+      // Also update inside mesaContent if currently present
+      let mesa = getMesaContent();
+      mesa = mesa.map(m => {
+        if (m.id === itemId) {
+          m.loop = !m.loop;
+        }
+        return m;
+      });
+      saveMesaContent(mesa);
+
+      loadGallery();
+    }
+
+    // 6. Mesa Preview & Zoom Handlers
+    function renderMesaPreview() {
+      const stage = document.getElementById('previewStage');
+      const mesa = getMesaContent();
+
+      stage.innerHTML = '';
+      if (!mesa || mesa.length === 0) {
+        stage.innerHTML = `<div class="preview-empty">Nenhum elemento exibido na mesa no momento. Adicione itens da galeria abaixo.</div>`;
+        return;
+      }
+
+      mesa.forEach(item => {
+        const itemBox = document.createElement('div');
+        itemBox.className = 'preview-item';
+
+        const isVideo = (item.tipo === 'video' || (item.url && item.url.includes('.mp4')) || (item.url && item.url.startsWith('data:video/')));
+        if (isVideo) {
+          itemBox.innerHTML = `
+            <video src="${item.url}" autoplay muted ${item.loop ? 'loop' : ''} playsinline></video>
+            <div class="preview-badge">${item.titulo || 'Vídeo da Mesa'}</div>
+          `;
+        } else {
+          itemBox.innerHTML = `
+            <img src="${item.url}" alt="${item.titulo || 'Item da Mesa'}" />
+            <div class="preview-badge">${item.titulo || 'Imagem da Mesa'}</div>
+          `;
+        }
+        stage.appendChild(itemBox);
+      });
+
+      applyZoomFromStorage();
+    }
+
+    function handleZoomChange(val) {
+      const zoomFloat = parseFloat(val);
+      localStorage.setItem(KEYS.MESA_ZOOM, zoomFloat);
+      document.getElementById('zoomValText').textContent = Math.round(zoomFloat * 100) + '%';
+      const stage = document.getElementById('previewStage');
+      if (stage) stage.style.transform = `scale(${zoomFloat})`;
+    }
+
+    function resetZoom() {
+      const slider = document.getElementById('zoomSlider');
+      if (slider) slider.value = "1.0";
+      handleZoomChange(1.0);
+    }
+
+    function applyZoomFromStorage() {
+      const savedZoom = localStorage.getItem(KEYS.MESA_ZOOM) || "1.0";
+      const slider = document.getElementById('zoomSlider');
+      if (slider) slider.value = savedZoom;
+      document.getElementById('zoomValText').textContent = Math.round(parseFloat(savedZoom) * 100) + '%';
+      const stage = document.getElementById('previewStage');
+      if (stage) stage.style.transform = `scale(${parseFloat(savedZoom)})`;
+    }
+
+    // 7. Upload Handler
+    function handleUpload() {
+      const nameInput = document.getElementById('uploadItemName');
+      const fileInput = document.getElementById('uploadItemFile');
+      const name = nameInput.value.trim();
+      const file = fileInput.files[0];
+
+      if (!name) {
+        alert('Por favor, informe o nome do item.');
+        return;
+      }
+      if (!file) {
+        alert('Selecione um arquivo de imagem ou vídeo.');
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const base64Data = e.target.result;
+        const isVideo = file.type.startsWith('video/') || document.getElementById('uploadMediaType').value === 'video';
+        const type = isVideo ? 'video' : 'imagem';
+
+        const newItem = {
+          id: 'item_' + Date.now(),
+          name: name,
+          tipo: type,
+          data: base64Data,
+          loop: isVideo ? true : false,
+          dateAdded: new Date().toISOString()
+        };
+
+        if (currentTab === 'cenarios') {
+          newItem.category = currentCenarioSub;
+          let list = getStoredItems(KEYS.CENARIOS);
+          list.push(newItem);
+          setStoredItems(KEYS.CENARIOS, list);
+        } else if (currentTab === 'conteudo') {
+          let list = getStoredItems(KEYS.CONTEUDO);
+          list.push(newItem);
+          setStoredItems(KEYS.CONTEUDO, list);
+        } else if (currentTab === 'apresentacao') {
+          let list = getStoredItems(KEYS.APRESENTACAO);
+          list.push(newItem);
+          setStoredItems(KEYS.APRESENTACAO, list);
+        }
+
+        nameInput.value = '';
+        fileInput.value = '';
+        loadGallery();
+      };
+
+      reader.readAsDataURL(file);
+    }
+
+    // 8. Floating Draggable Dice Panel Logic
+    function makeDraggable(el, handle) {
+      let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+      handle.onmousedown = dragMouseDown;
+
+      function dragMouseDown(e) {
+        e = e || window.event;
+        e.preventDefault();
+        pos3 = e.clientX;
+        pos4 = e.clientY;
+        document.onmouseup = closeDragElement;
+        document.onmousemove = elementDrag;
+      }
+
+      function elementDrag(e) {
+        e = e || window.event;
+        e.preventDefault();
+        pos1 = pos3 - e.clientX;
+        pos2 = pos4 - e.clientY;
+        pos3 = e.clientX;
+        pos4 = e.clientY;
+        el.style.top = (el.offsetTop - pos2) + "px";
+        el.style.left = (el.offsetLeft - pos1) + "px";
+        el.style.bottom = 'auto';
+        el.style.right = 'auto';
+      }
+
+      function closeDragElement() {
+        document.onmouseup = null;
+        document.onmousemove = null;
+      }
+    }
+
+    let isDiceMinimized = false;
+    function toggleDiceMinimize() {
+      const body = document.getElementById('floatingDiceBody');
+      const btn = document.getElementById('btnMinimizeDice');
+      isDiceMinimized = !isDiceMinimized;
+      if (isDiceMinimized) {
+        body.style.display = 'none';
+        btn.innerHTML = '&#43;';
+      } else {
+        body.style.display = 'flex';
+        btn.innerHTML = '&#8722;';
+      }
+    }
+
+    function rollDie(sides) {
+      const valEl = document.getElementById('diceRollVal');
+      const labelEl = document.getElementById('diceRollLabel');
+
+      labelEl.textContent = `Rolando d${sides}...`;
+      valEl.classList.add('rolling');
+
+      setTimeout(() => {
+        const rollResult = Math.floor(Math.random() * sides) + 1;
+        valEl.classList.remove('rolling');
+        valEl.textContent = rollResult;
+        labelEl.textContent = `Resultado para d${sides}:`;
+
+        // Save roll to dice history
+        let history = getDiceHistory();
+        const rollRecord = {
+          id: 'roll_' + Date.now(),
+          user: currentUser.login || 'Mestre',
+          dieType: `d${sides}`,
+          bonus: 0,
+          result: rollResult,
+          total: rollResult,
+          timestamp: new Date().toISOString(),
+          sessionId: 'sess_1'
+        };
+        history.unshift(rollRecord);
+        if (history.length > 50) history.pop();
+        saveDiceHistory(history);
+
+        renderRecentDiceTags();
+      }, 300);
+    }
+
+    function renderRecentDiceTags() {
+      const container = document.getElementById('diceRecentLogs');
+      const history = getDiceHistory();
+      container.innerHTML = '';
+      const recent = history.slice(0, 6);
+      if (recent.length === 0) {
+        container.innerHTML = '<span>Nenhuma rolagem recente.</span>';
+        return;
+      }
+      recent.forEach(r => {
+        const tag = document.createElement('span');
+        tag.className = 'dice-tag';
+        tag.textContent = `${r.dieType}: ${r.total}`;
+        container.appendChild(tag);
+      });
+    }
+
+    // Initialize Page
+    document.addEventListener('DOMContentLoaded', () => {
+      seedDefaultGalleries();
+      loadGallery();
+      renderRecentDiceTags();
+
+      const panel = document.getElementById('floatingDicePanel');
+      const header = document.getElementById('floatingDiceHeader');
+      if (panel && header) {
+        makeDraggable(panel, header);
+      }
+    });
+  </script>
+</body>
+</html>

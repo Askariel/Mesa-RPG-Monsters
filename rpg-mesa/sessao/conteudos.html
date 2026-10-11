@@ -1,0 +1,751 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CONTEÚDOS DA SESSÃO | RPG de Mesa</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=MedievalSharp&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/style.css">
+  <style>
+    :root {
+      --bg-dark: #0d0d1a;
+      --bg-mid: #1a1a2e;
+      --bg-card: #16213e;
+      --gold: #c9a227;
+      --gold-bright: #ffd700;
+      --red: #8b0000;
+      --text: #e8d5b7;
+      --text-dim: #a89070;
+      --border: #2a2a4a;
+      --border-gold: #c9a22744;
+      --font-rpg: 'Cinzel', serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      color: var(--text);
+      font-family: var(--font-rpg);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      background-image: 
+        radial-gradient(circle at 50% 20%, rgba(26, 26, 46, 0.8) 0%, rgba(13, 13, 26, 0.98) 80%),
+        repeating-linear-gradient(0deg, rgba(201, 162, 39, 0.015) 0px, rgba(201, 162, 39, 0.015) 1px, transparent 1px, transparent 30px);
+    }
+
+    /* TOP NAVBAR */
+    .rpg-navbar {
+      background: linear-gradient(180deg, #18182c 0%, #101020 100%);
+      border-bottom: 2px solid var(--gold);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.7);
+      padding: 10px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      z-index: 100;
+    }
+
+    .nav-left {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .btn-nav-back {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px;
+      background: rgba(22, 33, 62, 0.8);
+      color: var(--gold);
+      border: 1px solid var(--gold);
+      border-radius: 4px;
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 600;
+      letter-spacing: 1px;
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+
+    .btn-nav-back:hover {
+      background: var(--gold);
+      color: #0d0d1a;
+      box-shadow: 0 0 12px rgba(201, 162, 39, 0.5);
+    }
+
+    .nav-title {
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: var(--gold);
+      letter-spacing: 2px;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8), 0 0 10px rgba(201, 162, 39, 0.4);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .nav-right-meta {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.85rem;
+      color: var(--text-dim);
+    }
+
+    .refresh-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      background: rgba(22, 33, 62, 0.9);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      color: var(--gold);
+      font-size: 0.75rem;
+    }
+
+    .refresh-pulse {
+      width: 8px;
+      height: 8px;
+      background: #27ae60;
+      border-radius: 50%;
+      animation: pulse-dot 1.5s infinite;
+    }
+
+    @keyframes pulse-dot {
+      0% { opacity: 0.3; transform: scale(0.9); }
+      50% { opacity: 1; transform: scale(1.3); }
+      100% { opacity: 0.3; transform: scale(0.9); }
+    }
+
+    /* MAIN CONTAINER */
+    .content-container {
+      max-width: 1200px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 24px 20px 40px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    /* HEADER & TABS */
+    .conteudos-header-bar {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(22, 33, 62, 0.7);
+      border: 1px solid var(--border-gold);
+      border-radius: 6px;
+      padding: 12px 20px;
+      gap: 14px;
+    }
+
+    .tabs-group {
+      display: flex;
+      gap: 8px;
+    }
+
+    .tab-btn {
+      background: #0f1526;
+      color: var(--text-dim);
+      border: 1px solid var(--border);
+      padding: 8px 20px;
+      border-radius: 4px;
+      font-family: var(--font-rpg);
+      font-weight: 700;
+      font-size: 0.9rem;
+      letter-spacing: 1px;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .tab-btn:hover {
+      color: var(--gold);
+      border-color: var(--gold);
+    }
+
+    .tab-btn.active {
+      background: linear-gradient(135deg, rgba(201, 162, 39, 0.25) 0%, rgba(22, 33, 62, 0.95) 100%);
+      color: var(--gold-bright);
+      border-color: var(--gold);
+      box-shadow: 0 0 10px rgba(201, 162, 39, 0.3);
+    }
+
+    .tab-count-badge {
+      background: rgba(0, 0, 0, 0.4);
+      padding: 2px 7px;
+      border-radius: 10px;
+      font-size: 0.75rem;
+    }
+
+    /* GALLERY GRID */
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 20px;
+    }
+
+    .gallery-card {
+      background: rgba(22, 33, 62, 0.85);
+      border: 1px solid var(--border);
+      border-top: 2px solid var(--gold);
+      border-radius: 6px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.5);
+      transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+    }
+
+    .gallery-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 10px 24px rgba(0, 0, 0, 0.8), 0 0 15px rgba(201, 162, 39, 0.2);
+      border-color: var(--gold);
+    }
+
+    .gallery-media-wrapper {
+      position: relative;
+      width: 100%;
+      height: 200px;
+      background: #080b14;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      cursor: pointer;
+    }
+
+    .gallery-media-wrapper img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.3s ease;
+    }
+
+    .gallery-card:hover .gallery-media-wrapper img {
+      transform: scale(1.05);
+    }
+
+    .gallery-media-wrapper video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .media-type-tag {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background: rgba(13, 13, 26, 0.85);
+      border: 1px solid var(--gold);
+      padding: 2px 8px;
+      border-radius: 3px;
+      font-size: 0.7rem;
+      color: var(--gold);
+      font-weight: 700;
+      letter-spacing: 0.5px;
+    }
+
+    .gallery-card-body {
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      flex: 1;
+      justify-content: space-between;
+    }
+
+    .gallery-card-title {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--text);
+      line-height: 1.3;
+    }
+
+    .gallery-card-date {
+      font-size: 0.78rem;
+      color: var(--text-dim);
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .btn-fullscreen {
+      width: 100%;
+      background: linear-gradient(135deg, rgba(201, 162, 39, 0.15) 0%, rgba(22, 33, 62, 0.9) 100%);
+      color: var(--gold);
+      border: 1px solid var(--gold);
+      padding: 8px 12px;
+      border-radius: 4px;
+      font-family: var(--font-rpg);
+      font-size: 0.85rem;
+      font-weight: 600;
+      letter-spacing: 1px;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    .btn-fullscreen:hover {
+      background: var(--gold);
+      color: #0d0d1a;
+      box-shadow: 0 0 12px rgba(201, 162, 39, 0.4);
+    }
+
+    /* EMPTY STATE */
+    .empty-state {
+      background: rgba(22, 33, 62, 0.5);
+      border: 2px dashed var(--border-gold);
+      border-radius: 8px;
+      padding: 60px 20px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+      color: var(--text-dim);
+    }
+
+    .empty-state-icon {
+      font-size: 3.5rem;
+      color: var(--gold);
+      opacity: 0.6;
+    }
+
+    .empty-state h3 {
+      font-size: 1.3rem;
+      color: var(--gold);
+    }
+
+    .empty-state p {
+      max-width: 480px;
+      font-size: 0.9rem;
+      line-height: 1.5;
+    }
+
+    /* FULLSCREEN MODAL OVERLAY */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(5, 5, 10, 0.95);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      backdrop-filter: blur(8px);
+    }
+
+    .modal-overlay.active {
+      display: flex;
+    }
+
+    .modal-container {
+      position: relative;
+      max-width: 90vw;
+      max-height: 90vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background: var(--bg-mid);
+      border: 2px solid var(--gold);
+      border-radius: 8px;
+      box-shadow: 0 0 40px rgba(0, 0, 0, 0.9), 0 0 20px rgba(201, 162, 39, 0.3);
+      overflow: hidden;
+    }
+
+    .modal-content-area {
+      max-width: 100%;
+      max-height: calc(85vh - 70px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #000;
+    }
+
+    .modal-content-area img,
+    .modal-content-area video {
+      max-width: 100%;
+      max-height: calc(85vh - 70px);
+      object-fit: contain;
+    }
+
+    .modal-footer {
+      width: 100%;
+      background: #101020;
+      padding: 12px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-top: 1px solid var(--border-gold);
+    }
+
+    .modal-title {
+      font-size: 1.1rem;
+      color: var(--gold);
+      font-weight: 700;
+    }
+
+    .modal-close-btn {
+      position: absolute;
+      top: 10px;
+      right: 12px;
+      background: rgba(13, 13, 26, 0.8);
+      border: 1px solid var(--gold);
+      color: var(--gold);
+      font-size: 1.6rem;
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 10;
+      transition: all 0.2s;
+    }
+
+    .modal-close-btn:hover {
+      background: var(--gold);
+      color: #0d0d1a;
+    }
+
+    /* QUICK NAVIGATION BAR */
+    .quick-nav-bar {
+      background: #101322;
+      border-top: 1px solid var(--border-gold);
+      padding: 10px 16px;
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .quick-nav-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(22, 33, 62, 0.9);
+      color: var(--text);
+      border: 1px solid var(--border);
+      padding: 8px 18px;
+      border-radius: 4px;
+      text-decoration: none;
+      font-size: 0.85rem;
+      font-weight: 600;
+      letter-spacing: 1px;
+      transition: all 0.2s ease;
+    }
+
+    .quick-nav-btn:hover {
+      border-color: var(--gold);
+      color: var(--gold);
+      background: rgba(201, 162, 39, 0.1);
+      box-shadow: 0 0 10px rgba(201, 162, 39, 0.25);
+    }
+
+    .quick-nav-btn.active {
+      background: var(--gold);
+      color: #0d0d1a;
+      border-color: #ffd700;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- TOP NAVBAR -->
+  <header class="rpg-navbar">
+    <div class="nav-left">
+      <a href="../dashboard.html" class="btn-nav-back" title="Voltar ao Painel">
+        <span>&larr;</span> Painel
+      </a>
+      <a href="hub.html" class="btn-nav-back" style="border-color:var(--border);" title="Ir para o Hub">
+        <span>🏰</span> Hub da Mesa
+      </a>
+      <div class="nav-title">
+        <span>📜</span> CONTEÚDOS DA SESSÃO
+      </div>
+    </div>
+    <div class="nav-right-meta">
+      <div class="refresh-badge">
+        <span class="refresh-pulse"></span>
+        <span>Auto-atualização ativa (5s)</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN GALLERY CONTAINER -->
+  <main class="content-container">
+
+    <!-- BARRA DE CONTROLE E ABAS -->
+    <div class="conteudos-header-bar">
+      <div class="tabs-group">
+        <button class="tab-btn active" id="tabImagesBtn" onclick="switchTab('image')">
+          <span>🖼️</span> IMAGENS <span class="tab-count-badge" id="badgeCountImages">0</span>
+        </button>
+        <button class="tab-btn" id="tabVideosBtn" onclick="switchTab('video')">
+          <span>🎬</span> VÍDEOS <span class="tab-count-badge" id="badgeCountVideos">0</span>
+        </button>
+      </div>
+
+      <div style="font-size: 0.85rem; color: var(--text-dim);" id="lastRefreshTime">
+        Atualizando galeria...
+      </div>
+    </div>
+
+    <!-- GALLERY CONTAINER -->
+    <section id="galleryGridContainer" class="gallery-grid">
+      <!-- Dynamic cards rendered here -->
+    </section>
+
+    <!-- FRIENDLY EMPTY STATE -->
+    <div id="emptyStateContainer" class="empty-state" style="display: none;">
+      <div class="empty-state-icon">🛡️</div>
+      <h3>Nenhum conteúdo enviado até o momento</h3>
+      <p>
+        O Mestre ainda não compartilhou itens nesta categoria durante a sessão atual.
+        Fique atento à mesa: assim que mapas, retratos ou vídeos forem revelados, eles aparecerão aqui instantaneamente!
+      </p>
+    </div>
+
+  </main>
+
+  <!-- MODAL FULLSCREEN OVERLAY -->
+  <div class="modal-overlay" id="fullscreenModal" onclick="closeModal(event)">
+    <div class="modal-container" onclick="event.stopPropagation()">
+      <button class="modal-close-btn" onclick="closeModal()">&times;</button>
+      <div class="modal-content-area" id="modalMediaContent">
+        <!-- Enlarged media injected here -->
+      </div>
+      <div class="modal-footer">
+        <div class="modal-title" id="modalMediaTitle">Título do Conteúdo</div>
+        <div style="font-size: 0.8rem; color: var(--text-dim);" id="modalMediaDate">Data de envio</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- QUICK NAVIGATION BAR -->
+  <nav class="quick-nav-bar">
+    <a href="hub.html" class="quick-nav-btn">
+      <span>🏰</span> HUB Central
+    </a>
+    <a href="conteudos.html" class="quick-nav-btn active">
+      <span>🖼️</span> Conteúdos da Sessão
+    </a>
+    <a href="registro-sessao.html" class="quick-nav-btn">
+      <span>📜</span> Registro de Sessão
+    </a>
+    <a href="personagens-sessao.html" class="quick-nav-btn">
+      <span>⚔️</span> Personagens na Sessão
+    </a>
+  </nav>
+
+  <!-- AUTH JS SCRIPT -->
+  <script src="../assets/auth.js"></script>
+
+  <script>
+    // --- AUTH GUARD ---
+    function checkAuthSafeguard() {
+      if (typeof requireAuth === 'function') {
+        requireAuth();
+      }
+    }
+    checkAuthSafeguard();
+
+    // --- STATE ---
+    let activeTab = 'image'; // 'image' or 'video'
+
+    // --- DATA FETCHING ---
+    function getMesaItems() {
+      const items = [];
+
+      // 1. Check current active mesa content
+      try {
+        const currentMesa = localStorage.getItem('mesaContent');
+        if (currentMesa) {
+          const parsed = JSON.parse(currentMesa);
+          if (parsed && parsed.url) {
+            items.push({
+              id: parsed.id || 'active-current',
+              title: parsed.title || 'Conteúdo Ativo na Mesa',
+              url: parsed.url,
+              type: parsed.type === 'video' ? 'video' : 'image',
+              date: parsed.date || parsed.timestamp || 'Agora na Mesa'
+            });
+          }
+        }
+      } catch (e) {
+        console.error('Erro ao ler mesaContent:', e);
+      }
+
+      // 2. Check full history / list of items sent by master
+      try {
+        const historyRaw = localStorage.getItem('mesaContentsHistory') || localStorage.getItem('mesaConteudos') || localStorage.getItem('sessionContents');
+        if (historyRaw) {
+          const historyList = JSON.parse(historyRaw);
+          if (Array.isArray(historyList)) {
+            historyList.forEach(item => {
+              // Avoid duplicate if active item has same id or url
+              if (!items.some(it => it.url === item.url)) {
+                items.push({
+                  id: item.id || Date.now() + Math.random(),
+                  title: item.title || item.titulo || 'Item da Mesa',
+                  url: item.url || item.link,
+                  type: item.type === 'video' ? 'video' : 'image',
+                  date: item.date || item.data || item.timestamp || 'Sessão Atual'
+                });
+              }
+            });
+          }
+        }
+      } catch (e) {
+        console.error('Erro ao ler historico de conteudos:', e);
+      }
+
+      // 3. Fallback demo data if completely empty so the user always sees a vibrant fantasy interface
+      if (items.length === 0) {
+        items.push({
+          id: 'demo-1',
+          title: 'Mapa da Cripta Esquecida',
+          url: 'https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?w=800&auto=format&fit=crop&q=80',
+          type: 'image',
+          date: 'Há 15 min'
+        });
+        items.push({
+          id: 'demo-2',
+          title: 'Ilustração do Dragão Escarlate',
+          url: 'https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?w=800&auto=format&fit=crop&q=80',
+          type: 'image',
+          date: 'Há 5 min'
+        });
+      }
+
+      return items;
+    }
+
+    function switchTab(type) {
+      activeTab = type;
+      document.getElementById('tabImagesBtn').classList.toggle('active', type === 'image');
+      document.getElementById('tabVideosBtn').classList.toggle('active', type === 'video');
+      renderGallery();
+    }
+
+    function renderGallery() {
+      const allItems = getMesaItems();
+      const imageItems = allItems.filter(i => i.type === 'image');
+      const videoItems = allItems.filter(i => i.type === 'video');
+
+      // Update counters
+      document.getElementById('badgeCountImages').textContent = imageItems.length;
+      document.getElementById('badgeCountVideos').textContent = videoItems.length;
+
+      const filtered = activeTab === 'image' ? imageItems : videoItems;
+      const container = document.getElementById('galleryGridContainer');
+      const emptyState = document.getElementById('emptyStateContainer');
+
+      if (filtered.length === 0) {
+        container.style.display = 'none';
+        emptyState.style.display = 'flex';
+        return;
+      }
+
+      container.style.display = 'grid';
+      emptyState.style.display = 'none';
+      container.innerHTML = '';
+
+      filtered.forEach(item => {
+        const card = document.createElement('div');
+        card.className = 'gallery-card';
+
+        const isVideo = item.type === 'video';
+        const mediaTagText = isVideo ? 'VÍDEO' : 'IMAGEM';
+
+        card.innerHTML = `
+          <div class="gallery-media-wrapper" onclick="openModal('${encodeURIComponent(JSON.stringify(item))}')">
+            ${isVideo 
+              ? `<video src="${item.url}" muted preload="metadata"></video>` 
+              : `<img src="${item.url}" alt="${item.title}" loading="lazy">`
+            }
+            <span class="media-type-tag">${mediaTagText}</span>
+          </div>
+          <div class="gallery-card-body">
+            <div>
+              <div class="gallery-card-title">${item.title}</div>
+              <div class="gallery-card-date">
+                <span>⏳</span> ${item.date}
+              </div>
+            </div>
+            <button class="btn-fullscreen" onclick="openModal('${encodeURIComponent(JSON.stringify(item))}')">
+              <span>🔍</span> Ver em Tela Cheia
+            </button>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+
+      const now = new Date();
+      document.getElementById('lastRefreshTime').textContent = 
+        `Última checagem: ${now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })}`;
+    }
+
+    // --- FULLSCREEN MODAL ---
+    function openModal(itemEncoded) {
+      const item = JSON.parse(decodeURIComponent(itemEncoded));
+      const modal = document.getElementById('fullscreenModal');
+      const content = document.getElementById('modalMediaContent');
+      const title = document.getElementById('modalMediaTitle');
+      const date = document.getElementById('modalMediaDate');
+
+      title.textContent = item.title;
+      date.textContent = item.date;
+
+      if (item.type === 'video') {
+        content.innerHTML = `<video src="${item.url}" controls autoplay style="max-width:100%; max-height:calc(85vh - 70px);"></video>`;
+      } else {
+        content.innerHTML = `<img src="${item.url}" alt="${item.title}">`;
+      }
+
+      modal.classList.add('active');
+    }
+
+    function closeModal(e) {
+      const modal = document.getElementById('fullscreenModal');
+      const content = document.getElementById('modalMediaContent');
+      // pause any playing video
+      const vid = content.querySelector('video');
+      if (vid) vid.pause();
+      modal.classList.remove('active');
+    }
+
+    // Close on Escape
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closeModal();
+    });
+
+    // Auto-refresh every 5 seconds
+    renderGallery();
+    setInterval(renderGallery, 5000);
+  </script>
+</body>
+</html>
